@@ -1,0 +1,20 @@
+{
+  "name": "onchain-real-estate-ai",
+  "version": "1.0.0",
+  "description": "OnChain Real Estate AI with Arbitrum",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.22.19"
+  },
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:fuji": "hardhat run scripts/deploy.js --network fuji",
+    "deploy:arbitrum": "hardhat run scripts/deploy-arbitrum.js --network arbitrumSepolia",
+    "start": "node scripts/start-server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "ethers": "^6.8.1"
+  }
+}

@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block title %}AI Result Details - OnChain Real Estate AI{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0">
+                <i class="bi bi-robot text-primary me-2"></i>AI Result: Task #{{ task_id }}
+            </h1>
+            <div>
+                <a href="{{ url_for('ai_results') }}" class="btn btn-outline-secondary me-2">
+                    <i class="bi bi-arrow-left me-1"></i>Back to Results
+                </a>
+                {% if result.transaction_hash %}
+                <a href="https://sepolia.arbiscan.io/tx/{{ result.transaction_hash }}" class="btn btn-outline-primary" target="_blank">
+                    <i class="bi bi-link-45deg me-1"></i>View on Arbiscan
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Transaction Info Card -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-info-circle me-2"></i>Transaction Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Task ID:</strong> {{ result.task_id }}</p>
+                        <p><strong>Timestamp:</strong> {{ result.timestamp if result.timestamp else 'N/A' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p>
+                            <strong>Transaction Hash:</strong> 
+                            {% if result.transaction_hash %}
+                                <span class="badge bg-secondary text-wrap text-start" style="font-family: monospace;">
+                                    {{ result.transaction_hash }}
+                                </span>
+                            {% else %}
+                                <span class="badge bg-warning">Not Available</span>
+                            {% endif %}
+                        </p>
+                        <p>
+                            <strong>File:</strong> 
+                            <span class="badge bg-secondary text-wrap" style="font-family: monospace;">
+                                {{ result.filename if result.filename else 'N/A' }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Analysis Results Card -->
+        {% if result.structured_output %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-graph-up me-2"></i>Analysis Results
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% if result.structured_output.roi %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-light">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary">
+                                    <i class="bi bi-currency-dollar me-2"></i>ROI
+                                </h5>
+                                <p class="card-text">{{ result.structured_output.roi }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if result.structured_output.cap_rate %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-light">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary">
+                                    <i class="bi bi-percent me-2"></i>Cap Rate
+                                </h5>
+                                <p class="card-text">{{ result.structured_output.cap_rate }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if result.structured_output.cash_flow %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-light">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary">
+                                    <i class="bi bi-cash-stack me-2"></i>Cash Flow
+                                </h5>
+                                <p class="card-text">{{ result.structured_output.cash_flow }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if result.structured_output.appreciation %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-light">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary">
+                                    <i class="bi bi-arrow-up-right me-2"></i>Appreciation
+                                </h5>
+                                <p class="card-text">{{ result.structured_output.appreciation }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if result.structured_output.risk_assessment %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-light">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary">
+                                    <i class="bi bi-shield-exclamation me-2"></i>Risk Assessment
+                                </h5>
+                                <p class="card-text">{{ result.structured_output.risk_assessment }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if result.structured_output.recommendations %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 border-light">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary">
+                                    <i class="bi bi-lightbulb me-2"></i>Recommendations
+                                </h5>
+                                <p class="card-text">{{ result.structured_output.recommendations }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                {% if result.structured_output.summary %}
+                <div class="mt-4">
+                    <h5 class="text-primary">
+                        <i class="bi bi-file-text me-2"></i>Summary
+                    </h5>
+                    <div class="p-3 bg-light rounded">
+                        <p>{{ result.structured_output.summary }}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Raw Data Card -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-code-slash me-2"></i>Raw Result Data
+                </h5>
+            </div>
+            <div class="card-body">
+                <pre class="bg-light p-3 rounded" style="max-height: 300px; overflow-y: auto;"><code>{{ result.raw_result | tojson(indent=2) }}</code></pre>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Format JSON data for better display
+    document.addEventListener('DOMContentLoaded', function() {
+        const codeBlocks = document.querySelectorAll('pre code');
+        codeBlocks.forEach(block => {
+            try {
+                // For JSON strings that are already stringified inside the JSON
+                const content = block.textContent;
+                if (content.includes('"raw_result"')) {
+                    let parsed = JSON.parse(content);
+                    if (typeof parsed.raw_result === 'string' && parsed.raw_result.startsWith('{')) {
+                        try {
+                            // Try to parse the nested JSON
+                            const innerJson = JSON.parse(parsed.raw_result);
+                            parsed.raw_result = innerJson;
+                            block.textContent = JSON.stringify(parsed, null, 2);
+                        } catch (innerError) {
+                            // If inner parsing fails, leave as is
+                            console.log("Could not parse inner JSON", innerError);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error("Error formatting JSON:", error);
+            }
+        });
+    });
+</script>
+{% endblock %}

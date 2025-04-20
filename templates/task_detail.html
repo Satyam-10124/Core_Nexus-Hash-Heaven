@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+
+{% block title %}Task Details - OnChain Real Estate AI{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('recent_tasks') }}">Recent Tasks</a></li>
+                <li class="breadcrumb-item active">Task #{{ task.id }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-info-circle me-2"></i>Task Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Task ID:</strong> {{ task.id }}</p>
+                
+                {% if task.topic %}
+                    {% set is_json = true %}
+                    {% set topic_data = {} %}
+                    {% if task.topic is string %}
+                        {% set topic_str = task.topic %}
+                        {% if topic_str.startswith('{') and topic_str.endswith('}') %}
+                            <!-- Try to parse JSON -->
+                            {% set topic_data = task.topic|tojson|fromjson %}
+                        {% else %}
+                            {% set is_json = false %}
+                        {% endif %}
+                    {% else %}
+                        {% set topic_data = task.topic %}
+                    {% endif %}
+                    
+                    {% if is_json and topic_data and topic_data.property_address is defined %}
+                        <p><strong>Property Address:</strong> {{ topic_data.property_address }}</p>
+                        <p><strong>Analysis Type:</strong> {{ topic_data.task_type|replace('_', ' ')|title }}</p>
+                        
+                        {% if topic_data.additional_details and topic_data.additional_details.property_details %}
+                            <div class="mt-3">
+                                <h6>Property Details:</h6>
+                                <ul class="list-group list-group-flush">
+                                    {% for key, value in topic_data.additional_details.property_details.items() %}
+                                        <li class="list-group-item">
+                                            <strong>{{ key|replace('_', ' ')|title }}:</strong> 
+                                            {% if key == 'price' %}
+                                                ${{ '{:,.2f}'.format(value) }}
+                                            {% elif key == 'square_footage' %}
+                                                {{ '{:,}'.format(value) }} sq ft
+                                            {% else %}
+                                                {{ value }}
+                                            {% endif %}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <p><strong>Topic:</strong> {{ task.topic }}</p>
+                    {% endif %}
+                {% else %}
+                    <p><strong>Topic:</strong> Not available</p>
+                {% endif %}
+                
+                <p>
+                    <strong>Status:</strong> 
+                    {% if task.completed %}
+                        <span class="badge bg-success">Completed</span>
+                    {% else %}
+                        <span class="badge bg-warning text-dark">Pending</span>
+                    {% endif %}
+                </p>
+                
+                <p>
+                    <strong>Requester:</strong>
+                    <a href="https://sepolia.arbiscan.io/address/{{ task.requester }}" target="_blank" class="text-truncate d-inline-block" style="max-width: 200px;">
+                        {{ task.requester }}
+                        <i class="bi bi-box-arrow-up-right ms-1"></i>
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-file-text me-2"></i>Analysis Results
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if task.result %}
+                    {% set is_json_result = true %}
+                    {% set result_data = {} %}
+                    
+                    {% if task.result is string %}
+                        {% set result_str = task.result %}
+                        {% if result_str.startswith('{') and result_str.endswith('}') %}
+                            <!-- Try to parse JSON -->
+                            {% set result_data = task.result|tojson|fromjson %}
+                        {% else %}
+                            {% set is_json_result = false %}
+                        {% endif %}
+                    {% else %}
+                        {% set result_data = task.result %}
+                    {% endif %}
+                    
+                    {% if is_json_result and result_data %}
+                        <!-- Visual JSON Analysis Display -->
+                        <div class="analysis-cards slide-in-up">
+                            <!-- JSON Visualization -->
+                            <div class="row g-3 mb-4">
+                                {% set card_types = ["primary", "success", "info", "warning", "danger"] %}
+                                {% set icons = ["geo-alt", "graph-up-arrow", "star", "currency-dollar", "arrow-up-right"] %}
+                                
+                                {% for key, value in result_data.items() %}
+                                    {% set card_type = card_types[loop.index0 % card_types|length] %}
+                                    {% set icon = icons[loop.index0 % icons|length] %}
+                                    
+                                    <div class="col-md-6">
+                                        <div class="stat-card stat-card--{{ card_type }}">
+                                            <i class="bi bi-{{ icon }} stat-card__icon text-{{ card_type }}"></i>
+                                            <h6 class="stat-card__title">{{ key|replace('_', ' ')|title }}</h6>
+                                            <p class="stat-card__value">{{ value }}</p>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <!-- Raw JSON for reference -->
+                            <div class="accordion" id="rawJsonAccordion">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="rawJsonHeading">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#rawJsonCollapse" aria-expanded="false" aria-controls="rawJsonCollapse">
+                                            <i class="bi bi-code-slash me-2"></i> View Raw JSON
+                                        </button>
+                                    </h2>
+                                    <div id="rawJsonCollapse" class="accordion-collapse collapse" aria-labelledby="rawJsonHeading" data-bs-parent="#rawJsonAccordion">
+                                        <div class="accordion-body">
+                                            <pre class="json-content">{{ task.result|safe }}</pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <!-- Fallback for non-JSON results -->
+                        <div class="analysis-result fade-in">
+                            {{ task.result|safe }}
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="alert alert-warning fade-in">
+                        <i class="bi bi-hourglass-split me-2"></i>
+                        This task has not been completed yet. Results will appear here once the analysis is finished and stored on the blockchain.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-link-45deg me-2"></i>Blockchain Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Task Creation</h6>
+                        {% if task.transaction_hash or task.created_tx %}
+                            <p>
+                                <strong>Transaction:</strong>
+                                <a href="https://sepolia.arbiscan.io/tx/{{ task.transaction_hash or task.created_tx }}" target="_blank" class="text-truncate d-inline-block" style="max-width: 300px;">
+                                    {{ task.transaction_hash or task.created_tx }}
+                                    <i class="bi bi-box-arrow-up-right ms-1"></i>
+                                </a>
+                            </p>
+                            {% if task.transaction_status %}
+                                <p>
+                                    <strong>Status:</strong>
+                                    {% if task.transaction_status == "Success" %}
+                                        <span class="badge bg-success">Success</span>
+                                    {% elif task.transaction_status == "Failed" %}
+                                        <span class="badge bg-danger">Failed</span>
+                                        {% if task.error %}
+                                            <br><small class="text-danger">{{ task.error }}</small>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">{{ task.transaction_status }}</span>
+                                    {% endif %}
+                                </p>
+                            {% endif %}
+                            {% if task.created_block %}
+                                <p><strong>Block Number:</strong> {{ task.created_block }}</p>
+                            {% endif %}
+                        {% else %}
+                            <p class="text-muted">Transaction information not available</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h6>Task Completion</h6>
+                        {% if task.completed_tx %}
+                            <p>
+                                <strong>Transaction:</strong>
+                                <a href="https://sepolia.arbiscan.io/tx/{{ task.completed_tx }}" target="_blank" class="text-truncate d-inline-block" style="max-width: 300px;">
+                                    {{ task.completed_tx }}
+                                    <i class="bi bi-box-arrow-up-right ms-1"></i>
+                                </a>
+                            </p>
+                            <p><strong>Block Number:</strong> {{ task.completed_block }}</p>
+                        {% else %}
+                            <p class="text-muted">Not completed yet</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="alert alert-info mt-3">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>Blockchain Storage:</strong> This analysis result is permanently stored on the Arbitrum Sepolia blockchain and cannot be modified or deleted.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .analysis-result {
+        white-space: pre-wrap;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+    }
+</style>
+{% endblock %}

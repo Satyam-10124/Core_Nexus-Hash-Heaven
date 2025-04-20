@@ -1,0 +1,298 @@
+{% extends 'base.html' %}
+
+{% block title %}Recent Tasks - OnChain Real Estate AI{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h3 class="card-title mb-0">
+                    <i class="bi bi-list-check me-2"></i>Recent Real Estate Analyses
+                </h3>
+                <a href="{{ url_for('create_task') }}" class="btn btn-light">
+                    <i class="bi bi-plus-circle me-1"></i>New Analysis
+                </a>
+            </div>
+            <div class="card-body">
+                {% if tasks and tasks.tasks %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Property Address</th>
+                                    <th>Analysis Type</th>
+                                    <th>Requester</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for task in tasks.tasks %}
+                                    <tr>
+                                        <td>{{ task.id }}</td>
+                                        <td>
+                                            {% if task.topic %}
+                                                {% set is_json = true %}
+                                                {% set topic_data = {} %}
+                                                {% if task.topic is string %}
+                                                    {% set topic_str = task.topic %}
+                                                    {% if topic_str.startswith('{') and topic_str.endswith('}') %}
+                                                        <!-- Try to parse JSON -->
+                                                        {% set topic_data = task.topic|tojson|fromjson %}
+                                                    {% else %}
+                                                        {% set is_json = false %}
+                                                    {% endif %}
+                                                {% else %}
+                                                    {% set topic_data = task.topic %}
+                                                {% endif %}
+                                                
+                                                {% if is_json and topic_data and topic_data.property_address is defined %}
+                                                    <span title="{{ topic_data.property_address }}">
+                                                        {{ topic_data.property_address|truncate(30) }}
+                                                    </span>
+                                                {% else %}
+                                                    <span class="text-muted">Invalid format</span>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="text-muted">N/A</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if task.topic %}
+                                                {% set is_json = true %}
+                                                {% set topic_data = {} %}
+                                                {% if task.topic is string %}
+                                                    {% set topic_str = task.topic %}
+                                                    {% if topic_str.startswith('{') and topic_str.endswith('}') %}
+                                                        <!-- Try to parse JSON -->
+                                                        {% set topic_data = task.topic|tojson|fromjson %}
+                                                    {% else %}
+                                                        {% set is_json = false %}
+                                                    {% endif %}
+                                                {% else %}
+                                                    {% set topic_data = task.topic %}
+                                                {% endif %}
+                                                
+                                                {% if is_json and topic_data and topic_data.task_type is defined %}
+                                                    {{ topic_data.task_type|replace('_', ' ')|title }}
+                                                {% else %}
+                                                    <span class="text-muted">N/A</span>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="text-muted">N/A</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="https://sepolia.arbiscan.io/address/{{ task.requester }}" target="_blank" class="text-truncate d-inline-block" style="max-width: 100px;">
+                                                {{ task.requester|truncate(10) }}
+                                                <i class="bi bi-box-arrow-up-right"></i>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            {% if task.completed or task.status == "Completed" %}
+                                                <span class="badge bg-success">Completed</span>
+                                            {% else %}
+                                                <span class="badge bg-warning text-dark">Pending</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if task.created_block %}
+                                                <a href="https://sepolia.arbiscan.io/block/{{ task.created_block }}" target="_blank">
+                                                    Block #{{ task.created_block }}
+                                                </a>
+                                            {% else %}
+                                                <span class="text-muted">Unknown</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{{ url_for('view_task', task_id=task.id) }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-eye"></i> View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        No tasks found. Create a new analysis to get started.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-pie-chart me-2"></i>Task Status Distribution
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="taskStatusChart" width="400" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-graph-up me-2"></i>Analysis Type Distribution
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="analysisTypeChart" width="400" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Store task data in a hidden div to avoid mixing Jinja and JavaScript -->
+<div id="taskDataContainer" style="display: none;" 
+     data-task-data="{{ {'tasks': tasks.tasks if tasks and tasks.tasks else []}|tojson|replace('"', '&quot;') }}">
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Only run if we have charts to render
+        if (document.getElementById('taskStatusChart') && document.getElementById('analysisTypeChart')) {
+            // Get task data from the hidden div
+            var taskDataContainer = document.getElementById('taskDataContainer');
+            var taskDataString = taskDataContainer.getAttribute('data-task-data');
+            var taskData;
+            
+            try {
+                taskData = JSON.parse(taskDataString.replace(/&quot;/g, '"'));
+                
+                // Initialize charts if we have data
+                if (taskData && taskData.tasks && taskData.tasks.length > 0) {
+                    renderCharts(taskData);
+                }
+            } catch (e) {
+                console.error('Error parsing task data:', e);
+            }
+        }
+    });
+    
+    function renderCharts(taskData) {
+        renderStatusChart(taskData);
+        renderAnalysisTypeChart(taskData);
+    }
+    
+    function renderStatusChart(taskData) {
+        var statusCtx = document.getElementById('taskStatusChart').getContext('2d');
+        
+        // Count completed and pending tasks
+        var completedCount = 0;
+        var pendingCount = 0;
+        
+        taskData.tasks.forEach(function(task) {
+            if (task.completed || task.status === "Completed") {
+                completedCount++;
+            } else {
+                pendingCount++;
+            }
+        });
+        
+        var statusChart = new Chart(statusCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Completed', 'Pending'],
+                datasets: [{
+                    data: [completedCount, pendingCount],
+                    backgroundColor: [
+                        'rgba(40, 167, 69, 0.7)',
+                        'rgba(255, 193, 7, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(40, 167, 69, 1)',
+                        'rgba(255, 193, 7, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+    
+    function renderAnalysisTypeChart(taskData) {
+        var typeCtx = document.getElementById('analysisTypeChart').getContext('2d');
+        
+        // Count analysis types
+        var analysisTypes = {};
+        
+        taskData.tasks.forEach(function(task) {
+            if (task.topic) {
+                try {
+                    var topicData;
+                    if (typeof task.topic === 'string') {
+                        topicData = JSON.parse(task.topic);
+                    } else {
+                        topicData = task.topic;
+                    }
+                    
+                    var taskType = topicData.task_type;
+                    if (taskType) {
+                        var formattedType = taskType.replace(/_/g, ' ')
+                            .replace(/\b\w/g, function(l) { return l.toUpperCase(); });
+                        analysisTypes[formattedType] = (analysisTypes[formattedType] || 0) + 1;
+                    }
+                } catch (e) {
+                    console.error('Error parsing topic data:', e);
+                }
+            }
+        });
+        
+        var typeLabels = Object.keys(analysisTypes);
+        var typeData = Object.values(analysisTypes);
+        
+        var typeChart = new Chart(typeCtx, {
+            type: 'bar',
+            data: {
+                labels: typeLabels,
+                datasets: [{
+                    label: 'Number of Tasks',
+                    data: typeData,
+                    backgroundColor: 'rgba(13, 110, 253, 0.7)',
+                    borderColor: 'rgba(13, 110, 253, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,18 @@
+[
+  {
+    "task_id": 1,
+    "transaction_hash": "706735109c5ddea1ef6dad2d31bb565fc79375a08a555f7e9b712f1366182885",
+    "timestamp": "2025-04-20 10:06:19",
+    "property_address": "123 Main St, Springfield, IL",
+    "task_type": "investment_analysis",
+    "result_file": "task_1_706735109c.json"
+  },
+  {
+    "task_id": 23,
+    "transaction_hash": "c9c4297b2d9efc210e94d347061382e9216200fb5a0e691f66be9bf19b7de89a",
+    "timestamp": "2025-04-20 10:01:01",
+    "property_address": "Birla Aurora Mumbai",
+    "task_type": "investment_analysis",
+    "result_file": "task_23_c9c4297b2d.json"
+  }
+]

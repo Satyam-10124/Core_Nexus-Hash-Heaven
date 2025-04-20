@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}OnChain Real Estate AI{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Modern Navbar with Glassmorphism effect -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="bi bi-buildings me-2 text-primary"></i>
+                <span class="fw-bold">OnChain</span> <span class="text-primary">Real Estate AI</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.path == url_for('index') else '' }}" href="{{ url_for('index') }}">
+                            <i class="bi bi-house-door me-1"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.path == url_for('create_task') else '' }}" href="{{ url_for('create_task') }}">
+                            <i class="bi bi-plus-circle me-1"></i>New Analysis
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.path == url_for('recent_tasks') else '' }}" href="{{ url_for('recent_tasks') }}">
+                            <i class="bi bi-list-check me-1"></i>Recent Tasks
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.path == url_for('blockchain_info') else '' }}" href="{{ url_for('blockchain_info') }}">
+                            <i class="bi bi-link-45deg me-1"></i>Blockchain Info
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.path == url_for('ai_results') else '' }}" href="{{ url_for('ai_results') }}">
+                            <i class="bi bi-robot me-1"></i>AI Results
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.path == url_for('agent_outputs') else '' }}" href="{{ url_for('agent_outputs') }}">
+                            <i class="bi bi-cpu me-1"></i>Agent Outputs
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <div class="container mt-4 mb-5">
+        <!-- Flash Messages with Animation -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show slide-in-up" role="alert">
+                        <div class="d-flex align-items-center">
+                            {% if category == 'success' %}
+                                <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+                            {% elif category == 'warning' %}
+                                <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                            {% elif category == 'danger' or category == 'error' %}
+                                <i class="bi bi-exclamation-circle-fill me-2 fs-5"></i>
+                            {% else %}
+                                <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+                            {% endif %}
+                            <div>{{ message }}</div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Page Content -->
+        <div class="fade-in">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <!-- Modern Footer with Gradient -->
+    <footer class="footer mt-auto">
+        <div class="container py-5">
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <h5 class="mb-3"><i class="bi bi-buildings me-2"></i>OnChain Real Estate AI</h5>
+                    <p class="mb-3">AI-powered real estate analysis with permanent blockchain storage on Arbitrum Sepolia.</p>
+                    <div class="blockchain-badge mb-3">
+                        <i class="bi bi-hdd-network me-1"></i>
+                        <span>Connected to Arbitrum Sepolia</span>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6">
+                    <h5 class="mb-3">Quick Links</h5>
+                    <ul class="nav flex-column">
+                        <li class="nav-item mb-2">
+                            <a href="{{ url_for('index') }}" class="nav-link p-0">
+                                <i class="bi bi-chevron-right me-1 small"></i>Home
+                            </a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="{{ url_for('create_task') }}" class="nav-link p-0">
+                                <i class="bi bi-chevron-right me-1 small"></i>New Analysis
+                            </a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="{{ url_for('recent_tasks') }}" class="nav-link p-0">
+                                <i class="bi bi-chevron-right me-1 small"></i>Recent Tasks
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('blockchain_info') }}" class="nav-link p-0">
+                                <i class="bi bi-chevron-right me-1 small"></i>Blockchain Info
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('ai_results') }}" class="nav-link p-0">
+                                <i class="bi bi-chevron-right me-1 small"></i>AI Results
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('agent_outputs') }}" class="nav-link p-0">
+                                <i class="bi bi-chevron-right me-1 small"></i>Agent Outputs
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-4">
+                    <h5 class="mb-3">Blockchain</h5>
+                    <p class="mb-3">All analysis results are permanently stored on the Arbitrum Sepolia testnet.</p>
+                    <a href="https://sepolia.arbiscan.io/address/0x6218f4b695c4b54f7eb02060d80a7ee3649024e9" 
+                       class="btn btn-sm btn-outline-light" target="_blank">
+                        <i class="bi bi-box-arrow-up-right me-1"></i>View Contract on Arbiscan
+                    </a>
+                </div>
+            </div>
+            
+            <hr class="my-4">
+            
+            <div class="d-flex flex-column flex-sm-row justify-content-between">
+                <p class="mb-0">&copy; 2025 OnChain Real Estate AI. All rights reserved.</p>
+                <ul class="list-unstyled d-flex mt-2 mt-sm-0">
+                    <li class="ms-3">
+                        <a class="link-light" href="#" title="GitHub">
+                            <i class="bi bi-github"></i>
+                        </a>
+                    </li>
+                    <li class="ms-3">
+                        <a class="link-light" href="#" title="Twitter">
+                            <i class="bi bi-twitter-x"></i>
+                        </a>
+                    </li>
+                    <li class="ms-3">
+                        <a class="link-light" href="#" title="Discord">
+                            <i class="bi bi-discord"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Core Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Additional Libraries for Enhanced UI -->
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Custom Scripts -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    
+    {% block extra_js %}{% endblock %}
+    
+    <!-- Initialize UI components -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Activate all tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            
+            // Activate all popovers
+            const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+            popoverTriggerList.map(function(popoverTriggerEl) {
+                return new bootstrap.Popover(popoverTriggerEl);
+            });
+        });
+    </script>
+</body>
+</html>

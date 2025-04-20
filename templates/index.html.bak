@@ -1,0 +1,789 @@
+{% extends 'base.html' %}
+
+{% block title %}OnChain Real Estate AI - Home{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Hero Section Styles */
+    .hero-container {
+        min-height: 400px;
+        overflow: hidden;
+    }
+    
+    .hero-bg {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        z-index: 0;
+    }
+    
+    .hero-bg::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background-image: url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1073&q=80');
+        background-size: cover;
+        background-position: center;
+        opacity: 0.2;
+        z-index: -1;
+    }
+    
+    .hero-content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .highlight {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 4px;
+        padding: 2px 6px;
+    }
+    
+    /* Feature Card Styles */
+    .feature-card {
+        background-color: white;
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        box-shadow: var(--shadow-md);
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .section-title {
+        color: var(--gray-900);
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .section-subtitle {
+        color: var(--gray-600);
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+    
+    /* Analysis Types */
+    .analysis-type-card {
+        background-color: white;
+        border-radius: var(--radius);
+        padding: 1.25rem;
+        box-shadow: var(--shadow-sm);
+        height: 100%;
+        transition: all 0.3s ease;
+    }
+    
+    .analysis-type-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    /* Property Types */
+    .property-type-card {
+        background-color: white;
+        border-radius: var(--radius);
+        padding: 1.25rem;
+        box-shadow: var(--shadow-sm);
+        text-align: center;
+        height: 100%;
+        transition: all 0.3s ease;
+    }
+    
+    .property-type-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    /* Process Cards */
+    .process-card {
+        background-color: white;
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        box-shadow: var(--shadow-md);
+        text-align: center;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+    
+    .process-card:hover {
+        transform: translateY(-7px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .process-number {
+        width: 40px;
+        height: 40px;
+        background: var(--primary);
+        color: white;
+        border-radius: 50%;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+    }
+    
+    /* CTA Section */
+    .cta-container {
+        min-height: 300px;
+    }
+    
+    .cta-bg {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background: linear-gradient(135deg, var(--secondary), var(--primary-dark));
+        z-index: 0;
+    }
+    
+    .cta-content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .bg-gradient-secondary {
+        background: linear-gradient(135deg, var(--secondary), var(--primary-dark));
+    }
+    
+    /* Blockchain Info */
+    .blockchain-info {
+        font-family: var(--font-sans);
+    }
+    
+    .blockchain-address {
+        font-family: var(--font-mono);
+        font-size: 0.85rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 220px;
+        display: inline-block;
+        cursor: pointer;
+    }
+    
+    .blockchain-badge {
+        display: inline-flex;
+        align-items: center;
+        background-color: var(--gray-200);
+        padding: 0.5rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+    
+    /* Custom Accordion */
+    .custom-accordion .accordion-button {
+        background-color: var(--gray-100);
+        font-weight: 600;
+    }
+    
+    .custom-accordion .accordion-button:not(.collapsed) {
+        background-color: var(--primary);
+        color: white;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        padding: 2rem 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card border-0 rounded-lg shadow-lg overflow-hidden">
+            <div class="card-body p-0">
+                <div class="hero-container position-relative">
+                    <div class="hero-bg bg-gradient"></div>
+                    <div class="hero-content p-4 p-md-5 text-white">
+                        <h1 class="display-4 fw-bold mb-3">OnChain Real Estate AI</h1>
+                        <h2 class="h3 fw-light mb-4">AI-powered real estate analysis with <span class="highlight">permanent blockchain storage</span> on Arbitrum</h2>
+                        
+                        <p class="lead mb-4">Get professional real estate insights powered by AI and secured by blockchain technology.</p>
+                        
+                        {% if api_error %}
+                            <div class="alert alert-danger d-inline-flex align-items-center">
+                                <i class="bi bi-exclamation-triangle-fill me-2 fs-4"></i>
+                                <div>Unable to connect to the API. Please make sure the API server is running.</div>
+                            </div>
+                        {% else %}
+                            <div class="d-grid gap-3 d-md-flex justify-content-md-start mt-4">
+                                <a href="{{ url_for('create_task') }}" class="btn btn-primary btn-lg px-4 py-3 rounded-pill">
+                                    <i class="bi bi-plus-circle me-2"></i>Create New Analysis
+                                </a>
+                                <a href="{{ url_for('recent_tasks') }}" class="btn btn-outline-light btn-lg px-4 py-3 rounded-pill">
+                                    <i class="bi bi-list-check me-2"></i>View Recent Analyses
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="row mb-5">
+    <div class="col-12 text-center mb-4">
+        <h2 class="section-title">Why Use OnChain Real Estate AI?</h2>
+        <p class="section-subtitle">Combining the power of AI with the permanence of blockchain</p>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="feature-card h-100">
+            <div class="feature-icon mb-3 text-primary">
+                <i class="bi bi-robot fs-1"></i>
+            </div>
+            <h3 class="h5 mb-3">AI-Powered Analysis</h3>
+            <p>Get in-depth real estate insights generated by advanced AI models trained on comprehensive real estate data.</p>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="feature-card h-100">
+            <div class="feature-icon mb-3 text-primary">
+                <i class="bi bi-link-45deg fs-1"></i>
+            </div>
+            <h3 class="h5 mb-3">Blockchain Permanence</h3>
+            <p>All analyses are permanently stored on the Arbitrum Sepolia blockchain, ensuring immutability and verification.</p>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="feature-card h-100">
+            <div class="feature-icon mb-3 text-primary">
+                <i class="bi bi-graph-up-arrow fs-1"></i>
+            </div>
+            <h3 class="h5 mb-3">Data-Driven Decisions</h3>
+            <p>Make confident real estate decisions with comprehensive data on market trends, property values, and investment potentials.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Analysis Types Section -->
+<div class="row mb-5">
+    <div class="col-lg-6 mb-4">
+        <div class="card border-0 rounded-lg shadow-sm h-100">
+            <div class="card-header bg-primary text-white py-3">
+                <h3 class="card-title mb-0 fs-4">
+                    <i class="bi bi-clipboard-data me-2"></i>Analysis Types
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="analysis-type-card">
+                            <i class="bi bi-graph-up text-primary mb-2"></i>
+                            <h4 class="h6 mb-2">Market Analysis</h4>
+                            <p class="small mb-0">Comprehensive market trends and conditions</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="analysis-type-card">
+                            <i class="bi bi-house-check text-primary mb-2"></i>
+                            <h4 class="h6 mb-2">Property Valuation</h4>
+                            <p class="small mb-0">Accurate property value assessments</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="analysis-type-card">
+                            <i class="bi bi-cash-stack text-primary mb-2"></i>
+                            <h4 class="h6 mb-2">Investment Analysis</h4>
+                            <p class="small mb-0">ROI projections and investment insights</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="analysis-type-card">
+                            <i class="bi bi-geo-alt text-primary mb-2"></i>
+                            <h4 class="h6 mb-2">Neighborhood Insights</h4>
+                            <p class="small mb-0">Detailed location-specific data</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6 mb-4">
+        <div class="card border-0 rounded-lg shadow-sm h-100">
+            <div class="card-header bg-primary text-white py-3">
+                <h3 class="card-title mb-0 fs-4">
+                    <i class="bi bi-info-circle me-2"></i>Blockchain Status
+                </h3>
+            </div>
+            <div class="card-body">
+                {% if recent_tasks and recent_tasks.contract_owner %}
+                    <div class="blockchain-info">
+                        <div class="mb-3">
+                            <h5 class="fw-bold mb-2">Network</h5>
+                            <div class="d-flex align-items-center bg-light rounded p-2">
+                                <div class="blockchain-badge">
+                                    <i class="bi bi-hdd-network me-2"></i>
+                                    <span>Arbitrum Sepolia Testnet</span>
+                                </div>
+                                <span class="ms-auto badge bg-success">Connected</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h5 class="fw-bold mb-2">Contract Owner</h5>
+                            <div class="d-flex align-items-center bg-light rounded p-2">
+                                <span class="blockchain-address me-2" title="Click to copy" data-bs-toggle="tooltip">
+                                    {{ recent_tasks.contract_owner }}
+                                </span>
+                                <a href="https://sepolia.arbiscan.io/address/{{ recent_tasks.contract_owner }}" target="_blank" class="ms-auto btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-box-arrow-up-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h5 class="fw-bold mb-2">Connected Account</h5>
+                            <div class="d-flex align-items-center bg-light rounded p-2">
+                                <span class="blockchain-address me-2" title="Click to copy" data-bs-toggle="tooltip">
+                                    {{ recent_tasks.account_address }}
+                                </span>
+                                {% if recent_tasks.is_owner %}
+                                    <span class="ms-auto badge bg-success">Owner</span>
+                                {% else %}
+                                    <span class="ms-auto badge bg-secondary">Not Owner</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <a href="{{ url_for('blockchain_info') }}" class="btn btn-primary rounded-pill">
+                                <i class="bi bi-info-circle me-2"></i>More Blockchain Details
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    <p class="text-muted">Blockchain information not available</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- How It Works Section -->
+<div class="row mb-5">
+    <div class="col-12 text-center mb-4">
+        <h2 class="section-title">How It Works</h2>
+        <p class="section-subtitle">A simple three-step process to AI-powered real estate analysis</p>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="process-card h-100">
+            <div class="process-number">1</div>
+            <h3 class="h5 mb-3">Enter Property Details</h3>
+            <p>Provide the property address and select the type of analysis you need. Add any relevant property details for better accuracy.</p>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="process-card h-100">
+            <div class="process-number">2</div>
+            <h3 class="h5 mb-3">AI Analysis</h3>
+            <p>Our AI system, powered by Google Gemini and enhanced with internet search capabilities, performs a comprehensive analysis.</p>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="process-card h-100">
+            <div class="process-number">3</div>
+            <h3 class="h5 mb-3">Blockchain Storage</h3>
+            <p>Results are permanently stored on the Arbitrum Sepolia blockchain, providing an immutable record of your property analysis.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Property Types Section -->
+<div class="row mb-5">
+    <div class="col-md-6 mb-4">
+        <div class="card border-0 rounded-lg shadow-sm h-100">
+            <div class="card-header bg-secondary text-white py-3">
+                <h3 class="card-title mb-0 fs-4">
+                    <i class="bi bi-house-door me-2"></i>Supported Property Types
+                </h3>
+            </div>
+            <div class="card-body">
+                {% if property_types %}
+                    <div class="row g-3">
+                        {% for property_type in property_types %}
+                            <div class="col-md-6">
+                                <div class="property-type-card">
+                                    <i class="bi bi-building text-secondary mb-2"></i>
+                                    <h4 class="h6 mb-0">{{ property_type }}</h4>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info d-flex align-items-center">
+                        <i class="bi bi-info-circle-fill me-2 fs-4"></i>
+                        <div>Property type information not available</div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card border-0 rounded-lg shadow-sm h-100">
+            <div class="card-header bg-secondary text-white py-3">
+                <h3 class="card-title mb-0 fs-4">
+                    <i class="bi bi-graph-up me-2"></i>Analysis Types
+                </h3>
+            </div>
+            <div class="card-body">
+                {% if analysis_types %}
+                    <div class="accordion custom-accordion" id="analysisTypesAccordion">
+                        {% for analysis in analysis_types %}
+                            <div class="accordion-item border-0 mb-3">
+                                <h2 class="accordion-header rounded overflow-hidden">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ analysis.id }}">
+                                        <i class="bi bi-bar-chart-line me-2"></i> {{ analysis.name }}
+                                    </button>
+                                </h2>
+                                <div id="collapse{{ analysis.id }}" class="accordion-collapse collapse" data-bs-parent="#analysisTypesAccordion">
+                                    <div class="accordion-body bg-light rounded-bottom">
+                                        {{ analysis.description }}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info d-flex align-items-center">
+                        <i class="bi bi-info-circle-fill me-2 fs-4"></i>
+                        <div>Analysis type information not available</div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Analyses Section -->
+<div class="row mb-5">
+    <div class="col-12 mb-4">
+        <div class="card border-0 rounded-lg shadow-sm">
+            <div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
+                <h3 class="card-title mb-0 fs-4">
+                    <i class="bi bi-clock-history me-2"></i>Recent Analyses
+                </h3>
+                <a href="{{ url_for('recent_tasks') }}" class="btn btn-sm btn-light">
+                    <i class="bi bi-list me-1"></i>View All
+                </a>
+            </div>
+            <div class="card-body p-0">
+                {% if recent_tasks and recent_tasks.tasks %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="py-3">ID</th>
+                                    <th class="py-3">Property</th>
+                                    <th class="py-3">Type</th>
+                                    <th class="py-3">Status</th>
+                                    <th class="py-3 text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for task in recent_tasks.tasks[:5] %}
+                                    <tr class="align-middle">
+                                        <td class="fw-bold">#{{ task.id }}</td>
+                                        <td>
+                                            {% if task.topic %}
+                                                {% set topic_data = task.topic|tojson|fromjson %}
+                                                <div class="d-flex align-items-center">
+                                                    <i class="bi bi-geo-alt text-primary me-2"></i>
+                                                    <span>{{ topic_data.property_address if topic_data.property_address else "N/A" }}</span>
+                                                </div>
+                                            {% else %}
+                                                <span class="text-muted">N/A</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if task.topic %}
+                                                {% set topic_data = task.topic|tojson|fromjson %}
+                                                <span class="badge bg-light text-dark border">
+                                                    {{ topic_data.task_type|replace('_', ' ')|title if topic_data.task_type else "N/A" }}
+                                                </span>
+                                            {% else %}
+                                                <span class="text-muted">N/A</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if task.status == "Completed" %}
+                                                <span class="badge bg-success p-2">
+                                                    <i class="bi bi-check-circle me-1"></i>Completed
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-warning text-dark p-2">
+                                                    <i class="bi bi-hourglass-split me-1"></i>Pending
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end">
+                                            <a href="{{ url_for('view_task', task_id=task.id) }}" class="btn btn-primary btn-sm rounded-pill">
+                                                <i class="bi bi-eye me-1"></i>View Details
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="p-4 text-center">
+                        <div class="empty-state">
+                            <i class="bi bi-clipboard-x fs-1 text-muted mb-3"></i>
+                            <h4>No Recent Analyses</h4>
+                            <p class="text-muted">Create your first analysis to see it listed here</p>
+                            <a href="{{ url_for('create_task') }}" class="btn btn-primary rounded-pill mt-2">
+                                <i class="bi bi-plus-circle me-2"></i>Create New Analysis
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA Section -->
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card border-0 rounded-lg shadow-lg overflow-hidden">
+            <div class="card-body p-0">
+                <div class="cta-container position-relative">
+                    <div class="cta-bg bg-gradient-secondary"></div>
+                    <div class="cta-content p-4 p-md-5 text-center text-white">
+                        <h2 class="display-6 fw-bold mb-3">Ready to Get Started?</h2>
+                        <p class="lead mb-4">Create your first AI-powered real estate analysis now and store it permanently on the blockchain.</p>
+                        
+                        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                            <a href="{{ url_for('create_task') }}" class="btn btn-primary btn-lg px-4 py-3 rounded-pill">
+                                <i class="bi bi-plus-circle me-2"></i>Create New Analysis
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Hero Section Styles */
+    .hero-container {
+        min-height: 400px;
+        overflow: hidden;
+    }
+    
+    .hero-bg {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        z-index: 0;
+    }
+    
+    .hero-bg::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background-image: url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1073&q=80');
+        background-size: cover;
+        background-position: center;
+        opacity: 0.2;
+        z-index: -1;
+    }
+    
+    .hero-content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .highlight {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 4px;
+        padding: 2px 6px;
+    }
+    
+    /* Feature Card Styles */
+    .feature-card {
+        background-color: white;
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        box-shadow: var(--shadow-md);
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .section-title {
+        color: var(--gray-900);
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .section-subtitle {
+        color: var(--gray-600);
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+    
+    /* Analysis Types */
+    .analysis-type-card {
+        background-color: white;
+        border-radius: var(--radius);
+        padding: 1.25rem;
+        box-shadow: var(--shadow-sm);
+        height: 100%;
+        transition: all 0.3s ease;
+    }
+    
+    .analysis-type-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    /* Property Types */
+    .property-type-card {
+        background-color: white;
+        border-radius: var(--radius);
+        padding: 1.25rem;
+        box-shadow: var(--shadow-sm);
+        text-align: center;
+        height: 100%;
+        transition: all 0.3s ease;
+    }
+    
+    .property-type-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    /* Process Cards */
+    .process-card {
+        background-color: white;
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        box-shadow: var(--shadow-md);
+        text-align: center;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+    
+    .process-card:hover {
+        transform: translateY(-7px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .process-number {
+        width: 40px;
+        height: 40px;
+        background: var(--primary);
+        color: white;
+        border-radius: 50%;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+    }
+    
+    /* CTA Section */
+    .cta-container {
+        min-height: 300px;
+    }
+    
+    .cta-bg {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background: linear-gradient(135deg, var(--secondary), var(--primary-dark));
+        z-index: 0;
+    }
+    
+    .cta-content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .bg-gradient-secondary {
+        background: linear-gradient(135deg, var(--secondary), var(--primary-dark));
+    }
+    
+    /* Blockchain Info */
+    .blockchain-info {
+        font-family: var(--font-sans);
+    }
+    
+    .blockchain-address {
+        font-family: var(--font-mono);
+        font-size: 0.85rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 220px;
+        display: inline-block;
+        cursor: pointer;
+    }
+    
+    .blockchain-badge {
+        display: inline-flex;
+        align-items: center;
+        background-color: var(--gray-200);
+        padding: 0.5rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+    
+    /* Custom Accordion */
+    .custom-accordion .accordion-button {
+        background-color: var(--gray-100);
+        font-weight: 600;
+    }
+    
+    .custom-accordion .accordion-button:not(.collapsed) {
+        background-color: var(--primary);
+        color: white;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        padding: 2rem 0;
+    }
+</style>
+{% endblock %}

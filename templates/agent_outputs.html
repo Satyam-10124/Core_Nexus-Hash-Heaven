@@ -1,0 +1,358 @@
+{% extends 'base.html' %}
+
+{% block title %}Agent Outputs{% endblock %}
+
+{% block extra_css %}
+<style>
+    .property-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .property-card {
+        height: 100%;
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+    
+    .property-card:hover {
+        transform: translateY(-10px);
+    }
+    
+    .property-card__image {
+        height: 180px;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+        border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+        overflow: hidden;
+    }
+    
+    .property-card__image::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0));
+    }
+    
+    .property-card__badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        z-index: 10;
+    }
+    
+    .search-bar {
+        background: white;
+        border-radius: var(--radius-xl);
+        padding: 1rem 1.5rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        margin-bottom: 2rem;
+    }
+    
+    .filter-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-full);
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .filter-badge:hover {
+        transform: translateY(-2px);
+    }
+    
+    .filter-badge.active {
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-4">Real Estate Analysis</h1>
+            <p class="lead text-muted">AI-powered investment insights for property decisions</p>
+        </div>
+        <div class="col-md-4 text-right">
+            <form class="form-inline justify-content-end">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="searchInput" placeholder="Search properties...">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col">
+            <a href="{{ url_for('index') }}" class="btn btn-outline-primary">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="{{ url_for('ai_results') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-list"></i> View AI Results
+            </a>
+            <div class="btn-group ml-2">
+                <button type="button" class="btn btn-outline-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-filter"></i> Filter By
+                </button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#" data-filter="all">All Analysis Types</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#" data-filter="investment_analysis">Investment Analysis</a>
+                    <a class="dropdown-item" href="#" data-filter="market_analysis">Market Analysis</a>
+                    <a class="dropdown-item" href="#" data-filter="property_valuation">Property Valuation</a>
+                    <a class="dropdown-item" href="#" data-filter="rental_analysis">Rental Analysis</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-0">Property Analysis Portfolio</h2>
+                    <p class="text-muted">Browse all AI-powered real estate analyses stored on the blockchain</p>
+                </div>
+                <a href="{{ url_for('create_task') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>New Analysis
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="search-bar mb-4">
+        <div class="row">
+            <div class="col-md-6 mb-3 mb-md-0">
+                <div class="input-group">
+                    <span class="input-group-text bg-transparent border-0">
+                        <i class="fas fa-search text-muted"></i>
+                    </span>
+                    <input type="text" id="propertySearch" class="form-control border-0" placeholder="Search by address or analysis type...">
+                </div>
+            </div>
+            <div class="col-md-6 d-flex justify-content-md-end align-items-center">
+                <div class="filter-badges">
+                    <span class="filter-badge active bg-light text-dark" data-filter="all">All</span>
+                    <span class="filter-badge bg-primary text-white" data-filter="investment_analysis">Investment</span>
+                    <span class="filter-badge bg-success text-white" data-filter="market_analysis">Market</span>
+                    <span class="filter-badge bg-info text-white" data-filter="property_valuation">Valuation</span>
+                    <span class="filter-badge bg-warning text-white" data-filter="rental_analysis">Rental</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if results %}
+        <div class="property-grid">
+            {% for result in results %}
+                <div class="property-card" data-type="{{ result.task_type }}" data-address="{{ result.property_address }}">
+                    <div class="property-card__image" style="background-image: url('https://source.unsplash.com/random/600x400/?real,estate,property,{{ loop.index }}');">
+                        <div class="property-card__badge">
+                            <span class="premium-badge premium-badge-{{ 'primary' if result.task_type == 'investment_analysis' else 'success' if result.task_type == 'market_analysis' else 'info' if result.task_type == 'property_valuation' else 'warning' if result.task_type == 'rental_analysis' else 'secondary' }}">
+                                {{ result.task_type|replace('_', ' ')|title if result.task_type else 'Analysis' }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <h4 class="mb-3 property-address">{{ result.property_address }}</h4>
+                        
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="icon-box bg-gradient-{{ 'primary' if result.task_type == 'investment_analysis' else 'success' if result.task_type == 'market_analysis' else 'info' if result.task_type == 'property_valuation' else 'warning' if result.task_type == 'rental_analysis' else 'secondary' }} text-white mr-3">
+                                <i class="fas fa-hashtag"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-muted mb-0">Task ID</h6>
+                                <h5 class="mb-0">{{ result.task_id if result.task_id else 'N/A' }}</h5>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="icon-box bg-light mr-3">
+                                <i class="fas fa-calendar-alt text-secondary"></i>
+                            </div>
+                            <div>
+                                <h6 class="text-muted mb-0">Analysis Date</h6>
+                                <h5 class="mb-0">{{ result.timestamp if result.timestamp else 'N/A' }}</h5>
+                            </div>
+                        </div>
+                        
+                        {% if result.transaction_hash %}
+                        <div class="transaction-card mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="icon-box bg-gradient-{{ 'primary' if result.task_type == 'investment_analysis' else 'success' if result.task_type == 'market_analysis' else 'info' if result.task_type == 'property_valuation' else 'warning' if result.task_type == 'rental_analysis' else 'secondary' }} text-white mr-3">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="text-muted mb-1">Blockchain Transaction</h6>
+                                    <div class="transaction-hash mb-2">{{ result.transaction_hash }}</div>
+                                </div>
+                                <a href="https://sepolia.arbiscan.io/tx/{{ result.transaction_hash }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if result.crew_output and result.crew_output.json_dict and result.crew_output.json_dict.summary %}
+                        <div class="glass-card p-3 mb-3">
+                            <h6 class="mb-2">Summary</h6>
+                            <p class="mb-0 small">{{ result.crew_output.json_dict.summary|truncate(120) }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            <div class="blockchain-badge">
+                                <i class="fas fa-check-circle"></i> On-Chain
+                            </div>
+                            <a href="{{ url_for('agent_output_detail', filename=result.filename) }}" class="btn btn-{{ 'primary' if result.task_type == 'investment_analysis' else 'success' if result.task_type == 'market_analysis' else 'info' if result.task_type == 'property_valuation' else 'warning' if result.task_type == 'rental_analysis' else 'secondary' }}">
+                                <i class="fas fa-chart-bar mr-2"></i> View Analysis
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle mr-2"></i> No agent outputs found. <a href="{{ url_for('create_task') }}">Create a new analysis</a>.
+            </div>
+        </div>
+    {% endif %}
+
+    <div id="noResults" class="alert alert-info mt-4 d-none">
+        <i class="fas fa-search mr-2"></i> No properties match your search criteria. Try adjusting your filters.
+    </div>
+
+    
+    <!-- Custom CSS for this page -->
+    <style>
+        .bg-gradient-primary {
+            background: linear-gradient(45deg, #4e73df, #224abe);
+        }
+        
+        .bg-gradient-success {
+            background: linear-gradient(45deg, #1cc88a, #13855c);
+        }
+        
+        .bg-gradient-info {
+            background: linear-gradient(45deg, #36b9cc, #258391);
+        }
+        
+        .bg-gradient-warning {
+            background: linear-gradient(45deg, #f6c23e, #dda20a);
+        }
+        
+        .bg-gradient-secondary {
+            background: linear-gradient(45deg, #858796, #60616f);
+        }
+        
+        .bg-gradient-dark {
+            background: linear-gradient(45deg, #5a5c69, #373840);
+        }
+        
+        .icon-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+        }
+        
+        .hover-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .hover-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
+    </style>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Property search functionality
+        const searchInput = document.getElementById('propertySearch');
+        const propertyCards = document.querySelectorAll('.property-card');
+        const noResults = document.getElementById('noResults');
+        const filterBadges = document.querySelectorAll('.filter-badge');
+        
+        let activeFilter = 'all';
+        
+        // Filter functionality
+        filterBadges.forEach(badge => {
+            badge.addEventListener('click', function() {
+                // Remove active class from all badges
+                filterBadges.forEach(b => b.classList.remove('active'));
+                
+                // Add active class to clicked badge
+                this.classList.add('active');
+                
+                // Set active filter
+                activeFilter = this.getAttribute('data-filter');
+                
+                // Apply filters
+                applyFilters();
+            });
+        });
+        
+        // Search functionality
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                applyFilters();
+            });
+        }
+        
+        function applyFilters() {
+            const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+            let visibleCount = 0;
+            
+            propertyCards.forEach(card => {
+                const type = card.getAttribute('data-type') || '';
+                const address = card.getAttribute('data-address') || '';
+                
+                // Check if card matches both search term and filter
+                const matchesSearch = !searchTerm || 
+                                     address.toLowerCase().includes(searchTerm) || 
+                                     type.replace('_', ' ').toLowerCase().includes(searchTerm);
+                                     
+                const matchesFilter = activeFilter === 'all' || type === activeFilter;
+                
+                if (matchesSearch && matchesFilter) {
+                    card.style.display = '';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Show no results message if needed
+            if (noResults) {
+                if (visibleCount === 0) {
+                    noResults.classList.remove('d-none');
+                } else {
+                    noResults.classList.add('d-none');
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

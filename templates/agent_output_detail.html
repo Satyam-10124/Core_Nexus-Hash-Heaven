@@ -1,0 +1,630 @@
+{% extends 'base.html' %}
+
+{% block title %}Property Analysis: {{ result.property_address if result.property_address else 'Property' }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .analysis-header {
+        background: linear-gradient(135deg, rgba(79, 70, 229, 0.1), rgba(124, 58, 237, 0.05));
+        border-radius: var(--radius-xl);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+        border: 1px solid rgba(79, 70, 229, 0.1);
+    }
+    
+    .metric-card {
+        height: 100%;
+    }
+    
+    .tab-content {
+        padding: 1.5rem;
+        background: white;
+        border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    
+    .nav-tabs .nav-link {
+        font-weight: 500;
+        color: var(--gray-700);
+        padding: 0.75rem 1.25rem;
+        border: none;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        transition: all 0.3s ease;
+    }
+    
+    .nav-tabs .nav-link.active {
+        color: var(--primary);
+        background: white;
+        box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.03);
+    }
+    
+    .nav-tabs .nav-link:hover:not(.active) {
+        background: rgba(255, 255, 255, 0.7);
+    }
+    
+    .transaction-hash {
+        font-family: 'DM Mono', monospace;
+        font-size: 0.85rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-4">Property Analysis</h1>
+            <p class="lead text-muted">Comprehensive AI-powered investment analysis</p>
+        </div>
+        <div class="col-md-4 text-right d-flex justify-content-end align-items-center">
+            <span class="badge badge-pill badge-primary p-2 mr-2">{{ result.task_type|replace('_', ' ')|title if result.task_type else 'Analysis' }}</span>
+            <span class="badge badge-pill badge-secondary p-2">{{ result.timestamp if result.timestamp else 'N/A' }}</span>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col">
+            <a href="{{ url_for('agent_outputs') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Agent Outputs
+            </a>
+            <a href="{{ url_for('index') }}" class="btn btn-outline-primary">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="#" onclick="window.print()" class="btn btn-outline-info">
+                <i class="fas fa-print"></i> Print Report
+            </a>
+        </div>
+    </div>
+
+    <div class="analysis-header mb-4">
+        <div class="row">
+            <div class="col-md-6">
+                <h2 class="mb-4">Property Analysis</h2>
+                <div class="d-flex align-items-center mb-4">
+                    <div class="icon-box bg-gradient-primary text-white float">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1">Property Address</h6>
+                        <h4 class="mb-0">{{ result.property_address if result.property_address else 'N/A' }}</h4>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center">
+                    <div class="icon-box bg-gradient-secondary text-white float">
+                        <i class="fas fa-tag"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted mb-1">Analysis Type</h6>
+                        <div>
+                            <span class="premium-badge premium-badge-primary text-capitalize">{{ result.task_type|replace('_', ' ') if result.task_type else 'N/A' }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="transaction-card mb-3">
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="icon-box bg-gradient-info text-white mr-3">
+                            <i class="fas fa-hashtag"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">Task ID</h6>
+                            <h5 class="mb-0">{{ result.task_id if result.task_id else 'N/A' }}</h5>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="icon-box bg-gradient-success text-white mr-3">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1">Analysis Date</h6>
+                            <h5 class="mb-0">{{ result.timestamp if result.timestamp else 'N/A' }}</h5>
+                        </div>
+                    </div>
+                    {% if result.transaction_hash %}
+                    <hr class="fancy-divider my-3">
+                    <div class="d-flex flex-column">
+                        <h6 class="text-muted mb-2">Blockchain Transaction</h6>
+                        <div class="transaction-hash mb-2">{{ result.transaction_hash }}</div>
+                        <a href="https://sepolia.arbiscan.io/tx/{{ result.transaction_hash }}" target="_blank" class="btn btn-sm btn-outline-primary align-self-start">
+                            <i class="fas fa-external-link-alt mr-1"></i> View on Arbiscan
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Investment Analysis Summary -->
+    {% if result.crew_output and result.crew_output.json_dict %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-gradient-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-line mr-2"></i>Investment Analysis Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-light border-left border-success" style="border-left-width: 5px;">
+                        <h5 class="font-weight-bold">Executive Summary</h5>
+                        <p class="lead">{{ result.crew_output.json_dict.summary }}</p>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <!-- ROI Card -->
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100 border-0 shadow-sm hover-card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="icon-box bg-success-light rounded p-2 mr-3">
+                                            <i class="fas fa-percentage text-success"></i>
+                                        </div>
+                                        <h5 class="card-title mb-0">Return on Investment</h5>
+                                    </div>
+                                    <p class="card-text">{{ result.crew_output.json_dict.roi }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Cap Rate Card -->
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100 border-0 shadow-sm hover-card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="icon-box bg-info-light rounded p-2 mr-3">
+                                            <i class="fas fa-calculator text-info"></i>
+                                        </div>
+                                        <h5 class="card-title mb-0">Capitalization Rate</h5>
+                                    </div>
+                                    <p class="card-text">{{ result.crew_output.json_dict.cap_rate }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Cash Flow Card -->
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100 border-0 shadow-sm hover-card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="icon-box bg-primary-light rounded p-2 mr-3">
+                                            <i class="fas fa-money-bill-wave text-primary"></i>
+                                        </div>
+                                        <h5 class="card-title mb-0">Cash Flow</h5>
+                                    </div>
+                                    <p class="card-text">{{ result.crew_output.json_dict.cash_flow }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Appreciation Card -->
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100 border-0 shadow-sm hover-card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="icon-box bg-warning-light rounded p-2 mr-3">
+                                            <i class="fas fa-chart-bar text-warning"></i>
+                                        </div>
+                                        <h5 class="card-title mb-0">Appreciation</h5>
+                                    </div>
+                                    <p class="card-text">{{ result.crew_output.json_dict.appreciation }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Risk Assessment Card -->
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100 border-0 shadow-sm hover-card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="icon-box bg-danger-light rounded p-2 mr-3">
+                                            <i class="fas fa-exclamation-triangle text-danger"></i>
+                                        </div>
+                                        <h5 class="card-title mb-0">Risk Assessment</h5>
+                                    </div>
+                                    <p class="card-text">{{ result.crew_output.json_dict.risk_assessment }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Recommendations Card -->
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100 border-0 shadow-sm hover-card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="icon-box bg-secondary-light rounded p-2 mr-3">
+                                            <i class="fas fa-lightbulb text-secondary"></i>
+                                        </div>
+                                        <h5 class="card-title mb-0">Recommendations</h5>
+                                    </div>
+                                    <p class="card-text">{{ result.crew_output.json_dict.recommendations }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Investment Metrics -->
+    <div class="row mb-4">
+        <div class="col-12 mb-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">Investment Analysis</h3>
+                <button class="btn btn-primary" onclick="window.print()">
+                    <i class="fas fa-print mr-2"></i> Print Report
+                </button>
+            </div>
+            <hr class="fancy-divider my-3">
+        </div>
+        
+        {% if result.crew_output.json_dict.roi %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="metric-card">
+                <div class="metric-card__title">Return on Investment</div>
+                <div class="metric-card__value">
+                    {{ result.crew_output.json_dict.roi }}
+                </div>
+                <div class="metric-card__description">{{ result.crew_output.json_dict.roi }}</div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if result.crew_output.json_dict.cap_rate %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="metric-card">
+                <div class="metric-card__title">Cap Rate</div>
+                <div class="metric-card__value">
+                    {{ result.crew_output.json_dict.cap_rate }}
+                </div>
+                <div class="metric-card__description">{{ result.crew_output.json_dict.cap_rate }}</div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if result.crew_output.json_dict.cash_flow %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="metric-card">
+                <div class="metric-card__title">Cash Flow</div>
+                <div class="metric-card__value">
+                    {% if 'Positive' in result.crew_output.json_dict.cash_flow %}
+                        <span class="text-success">Positive</span>
+                    {% elif 'Negative' in result.crew_output.json_dict.cash_flow %}
+                        <span class="text-danger">Negative</span>
+                    {% elif 'Neutral' in result.crew_output.json_dict.cash_flow %}
+                        <span class="text-warning">Neutral</span>
+                    {% else %}
+                        Varies
+                    {% endif %}
+                </div>
+                <div class="metric-card__description">{{ result.crew_output.json_dict.cash_flow }}</div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if result.crew_output.json_dict.appreciation %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="metric-card">
+                <div class="metric-card__title">Appreciation Potential</div>
+                <div class="metric-card__value">
+                    {% if 'annual' in result.crew_output.json_dict.appreciation.lower() %}
+                        {{ result.crew_output.json_dict.appreciation.split('indicate')[1].split('annual')[0].strip() if 'indicate' in result.crew_output.json_dict.appreciation else result.crew_output.json_dict.appreciation }}
+                    {% else %}
+                        {% if 'High' in result.crew_output.json_dict.appreciation or 'Strong' in result.crew_output.json_dict.appreciation %}
+                            <span class="text-success">Strong</span>
+                        {% elif 'Moderate' in result.crew_output.json_dict.appreciation %}
+                            <span class="text-warning">Moderate</span>
+                        {% elif 'Low' in result.crew_output.json_dict.appreciation or 'Weak' in result.crew_output.json_dict.appreciation %}
+                            <span class="text-danger">Low</span>
+                        {% else %}
+                            Varies
+                        {% endif %}
+                    {% endif %}
+                </div>
+                <div class="metric-card__description">{{ result.crew_output.json_dict.appreciation }}</div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if result.crew_output.json_dict.risk_assessment %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="metric-card">
+                <div class="metric-card__title">Risk Assessment</div>
+                <div class="metric-card__value">
+                    {% if 'Low' in result.crew_output.json_dict.risk_assessment %}
+                        <span class="text-success">Low Risk</span>
+                    {% elif 'Moderate' in result.crew_output.json_dict.risk_assessment %}
+                        <span class="text-warning">Moderate Risk</span>
+                    {% elif 'High' in result.crew_output.json_dict.risk_assessment %}
+                        <span class="text-danger">High Risk</span>
+                    {% else %}
+                        Varies
+                    {% endif %}
+                </div>
+                <div class="metric-card__description">{{ result.crew_output.json_dict.risk_assessment }}</div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if result.crew_output.json_dict.recommendations %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="metric-card">
+                <div class="metric-card__title">Recommendations</div>
+                <div class="metric-card__description">{{ result.crew_output.json_dict.recommendations }}</div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if result.crew_output.json_dict.summary %}
+        <div class="col-12 mt-2">
+            <div class="glass-card p-4">
+                <h5 class="mb-3">Executive Summary</h5>
+                <p class="mb-0 lead">{{ result.crew_output.json_dict.summary }}</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Agent Output Content -->
+    <div class="card mb-4 shadow-sm border-0">
+        <div class="card-header bg-gradient-dark text-white">
+            <h5 class="mb-0"><i class="fas fa-robot mr-2"></i>AI Agent Analysis Details</h5>
+        </div>
+        <div class="card-body">
+            {% if result.agent_outputs %}
+                <div class="accordion" id="agentOutputAccordion">
+                    {% for agent_name, agent_output in result.agent_outputs.items() %}
+                        <div class="card border-0 shadow-sm mb-2">
+                            <div class="card-header bg-light" id="heading{{ loop.index }}">
+                                <h2 class="mb-0">
+                                    <button class="btn btn-link btn-block text-left text-decoration-none" type="button" data-toggle="collapse" data-target="#collapse{{ loop.index }}" aria-expanded="{{ 'true' if loop.index == 1 else 'false' }}" aria-controls="collapse{{ loop.index }}">
+                                        <i class="fas fa-user-tie mr-2"></i>{{ agent_name }}
+                                    </button>
+                                </h2>
+                            </div>
+                            <div id="collapse{{ loop.index }}" class="collapse {{ 'show' if loop.index == 1 else '' }}" aria-labelledby="heading{{ loop.index }}" data-parent="#agentOutputAccordion">
+                                <div class="card-body">
+                                    <pre class="bg-light p-3 rounded"><code>{{ agent_output }}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% elif result.crew_output %}
+                <ul class="nav nav-tabs" id="outputTabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="structured-tab" data-toggle="tab" href="#structured" role="tab" aria-controls="structured" aria-selected="true">
+                            <i class="fas fa-table mr-2"></i>Structured Data
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="raw-tab" data-toggle="tab" href="#raw" role="tab" aria-controls="raw" aria-selected="false">
+                            <i class="fas fa-code mr-2"></i>Raw Output
+                        </a>
+                    </li>
+                </ul>
+                <div class="tab-content p-3 border border-top-0 rounded-bottom" id="outputTabsContent">
+                    <div class="tab-pane fade show active" id="structured" role="tabpanel" aria-labelledby="structured-tab">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <tbody>
+                                    {% for key, value in result.crew_output.json_dict.items() %}
+                                    <tr>
+                                        <th style="width: 20%" class="text-capitalize">{{ key|replace('_', ' ') }}</th>
+                                        <td>{{ value }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="raw" role="tabpanel" aria-labelledby="raw-tab">
+                        <pre class="bg-light p-3 rounded"><code>{{ result.crew_output | tojson(indent=2) }}</code></pre>
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle mr-2"></i>No structured agent output available.
+                </div>
+                <pre class="bg-light p-3 rounded"><code>{{ result | tojson(indent=2) }}</code></pre>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Data Tabs -->
+    <div class="row">
+        <div class="col-12 mb-3">
+            <h3>Detailed Analysis Data</h3>
+            <hr class="fancy-divider my-3">
+        </div>
+        <div class="col-12">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="structured-tab" data-bs-toggle="tab" data-bs-target="#structured" type="button" role="tab" aria-controls="structured" aria-selected="true">
+                        <i class="fas fa-table mr-2"></i> Structured Data
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="raw-tab" data-bs-toggle="tab" data-bs-target="#raw" type="button" role="tab" aria-controls="raw" aria-selected="false">
+                        <i class="fas fa-code mr-2"></i> Raw JSON
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="blockchain-tab" data-bs-toggle="tab" data-bs-target="#blockchain" type="button" role="tab" aria-controls="blockchain" aria-selected="false">
+                        <i class="fas fa-link mr-2"></i> Blockchain Data
+                    </button>
+                </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="structured" role="tabpanel" aria-labelledby="structured-tab">
+                    {% if result.crew_output.json_dict %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead class="bg-gradient-primary text-white">
+                                    <tr>
+                                        <th>Property</th>
+                                        <th>Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for key, value in result.crew_output.json_dict.items() %}
+                                        <tr>
+                                            <td class="text-capitalize fw-medium">{{ key|replace('_', ' ') }}</td>
+                                            <td>{{ value }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info mt-3">
+                            <i class="fas fa-info-circle mr-2"></i> No structured data available.
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="tab-pane fade" id="raw" role="tabpanel" aria-labelledby="raw-tab">
+                    {% if result.crew_output %}
+                        <div class="json-content">
+                            <pre>{{ result.crew_output | tojson(indent=2) }}</pre>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info mt-3">
+                            <i class="fas fa-info-circle mr-2"></i> No raw JSON data available.
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="tab-pane fade" id="blockchain" role="tabpanel" aria-labelledby="blockchain-tab">
+                    {% if result.transaction_hash %}
+                        <div class="blockchain-info mb-4">
+                            <div class="glass-card p-4 mb-3">
+                                <h5 class="mb-3">Blockchain Storage Information</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <h6 class="text-muted mb-1">Network</h6>
+                                            <div class="blockchain-badge">
+                                                <i class="fas fa-network-wired"></i> Arbitrum Sepolia Testnet
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <h6 class="text-muted mb-1">Storage Status</h6>
+                                            <div class="premium-badge premium-badge-success">
+                                                <i class="fas fa-check-circle mr-1"></i> Verified On-Chain
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="json-content">
+                            <pre>{{ result.crew_output | tojson(indent=2) }}</pre>
+                        </div>
+                        
+                        <div class="mt-4 text-center">
+                            <a href="https://sepolia.arbiscan.io/tx/{{ result.transaction_hash }}" target="_blank" class="btn btn-primary">
+                                <i class="fas fa-external-link-alt mr-2"></i> View Transaction on Arbiscan
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info mt-3">
+                            <i class="fas fa-info-circle mr-2"></i> No blockchain data available.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Full JSON Data -->
+    <div class="card mb-4 shadow-sm border-0">
+        <div class="card-header bg-gradient-dark text-white">
+            <h5 class="mb-0 d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-code mr-2"></i>Complete JSON Data</span>
+                <button class="btn btn-sm btn-outline-light" type="button" data-toggle="collapse" data-target="#fullJsonCollapse" aria-expanded="false" aria-controls="fullJsonCollapse">
+                    <i class="fas fa-eye mr-1"></i>Toggle View
+                </button>
+            </h5>
+        </div>
+        <div class="collapse" id="fullJsonCollapse">
+            <div class="card-body">
+                <pre class="bg-light p-3 rounded"><code>{{ result | tojson(indent=2) }}</code></pre>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Custom CSS for this page -->
+    <style>
+        .bg-gradient-primary {
+            background: linear-gradient(45deg, #4e73df, #224abe);
+        }
+        
+        .bg-gradient-success {
+            background: linear-gradient(45deg, #1cc88a, #13855c);
+        }
+        
+        .bg-gradient-dark {
+            background: linear-gradient(45deg, #5a5c69, #373840);
+        }
+        
+        .icon-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+        }
+        
+        .hover-card {
+            transition: transform 0.3s ease;
+        }
+        
+        .hover-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .bg-success-light {
+            background-color: rgba(28, 200, 138, 0.1);
+        }
+        
+        .bg-info-light {
+            background-color: rgba(54, 185, 204, 0.1);
+        }
+        
+        .bg-primary-light {
+            background-color: rgba(78, 115, 223, 0.1);
+        }
+        
+        .bg-warning-light {
+            background-color: rgba(246, 194, 62, 0.1);
+        }
+        
+        .bg-danger-light {
+            background-color: rgba(231, 74, 59, 0.1);
+        }
+        
+        .bg-secondary-light {
+            background-color: rgba(133, 135, 150, 0.1);
+        }
+        
+        @media print {
+            .btn, .card-header button, #fullJsonCollapse, .nav-tabs {
+                display: none !important;
+            }
+            
+            .card {
+                break-inside: avoid;
+            }
+            
+            .collapse {
+                display: block !important;
+                height: auto !important;
+            }
+        }
+    </style>
+</div>
+{% endblock %}

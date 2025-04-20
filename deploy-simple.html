@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deploy AIAgent to Arbitrum</title>
+    <link rel="icon" href="data:,">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .container {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+            border: 1px solid #d6e9c6;
+        }
+        .error {
+            background-color: #f2dede;
+            color: #a94442;
+            border: 1px solid #ebccd1;
+        }
+        .warning {
+            background-color: #fcf8e3;
+            color: #8a6d3b;
+            border: 1px solid #faebcc;
+        }
+        .info {
+            background-color: #d9edf7;
+            color: #31708f;
+            border: 1px solid #bce8f1;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        #deploymentInfo {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Deploy AIAgent Contract to Arbitrum</h1>
+    
+    <div class="container">
+        <h2>Connection Status</h2>
+        <div>
+            <strong>Network:</strong> <span id="network">Not connected</span>
+        </div>
+        <div>
+            <strong>Account:</strong> <span id="account">Not connected</span>
+        </div>
+        <div>
+            <strong>Balance:</strong> <span id="balance">-</span>
+        </div>
+        <button id="connectWallet">Connect MetaMask</button>
+        <button id="switchNetwork" disabled>Switch to Arbitrum Sepolia</button>
+        <div id="connectionStatus" class="status"></div>
+    </div>
+    
+    <div class="container">
+        <h2>Deploy Contract</h2>
+        <p>This will deploy the AIAgent contract to Arbitrum Sepolia testnet.</p>
+        <button id="deployContract" disabled>Deploy Contract</button>
+        <div id="deploymentStatus" class="status"></div>
+        
+        <div id="deploymentInfo" class="status success">
+            <h3>Deployment Successful!</h3>
+            <p><strong>Contract Address:</strong> <span id="contractAddress"></span></p>
+            <p><strong>Transaction Hash:</strong> <span id="txHash"></span></p>
+            <p>
+                <a id="explorerLink" href="#" target="_blank">View on Arbiscan</a>
+            </p>
+            <h3>Next Steps:</h3>
+            <p>Update your .env file with the new contract address:</p>
+            <pre>CONTRACT_ADDRESS="<span id="contractAddressEnv"></span>"</pre>
+        </div>
+    </div>
+
+    <script>
+        // DOM elements
+        const connectWalletBtn = document.getElementById('connectWallet');
+        const switchNetworkBtn = document.getElementById('switchNetwork');
+        const deployContractBtn = document.getElementById('deployContract');
+        const networkSpan = document.getElementById('network');
+        const accountSpan = document.getElementById('account');
+        const balanceSpan = document.getElementById('balance');
+        const connectionStatus = document.getElementById('connectionStatus');
+        const deploymentStatus = document.getElementById('deploymentStatus');
+        const deploymentInfo = document.getElementById('deploymentInfo');
+        const contractAddressSpan = document.getElementById('contractAddress');
+        const contractAddressEnvSpan = document.getElementById('contractAddressEnv');
+        const txHashSpan = document.getElementById('txHash');
+        const explorerLink = document.getElementById('explorerLink');
+
+        // Variables
+        let currentAccount = null;
+        let currentChainId = null;
+
+        // AIAgent contract bytecode and ABI
+        const contractBytecode = "0x608060405234801561001057600080fd5b5061068d806100206000396000f3fe608060405234801561001057600080fd5b50600436106100575760003560e01c80633644e5151461005c57806354b8c5b61461007a578063c4c2e2831461009a578063c87b56dd146100b9578063f75c37d6146100ec575b600080fd5b61006461011c565b6040516100719190610363565b60405180910390f35b610084600481013561012c565b6040516100919190610437565b60405180910390f35b6100b760048101906100ab9190610548565b6102a0565b005b6100d660048036038101906100d19190610585565b610346565b6040516100e39190610363565b60405180910390f35b61010660048036038101906101019190610585565b610359565b6040516101139190610363565b60405180910390f35b6000600154905090565b61013461068a565b60008060008381526020019081526020016000209050600080600083815260200190815260200160002060000154036101a2576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040161019990610608565b60405180910390fd5b806000015481600101826002018360030160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16828260405160200161021a96959493929190610647565b604051602081830303815290604052905060008060008581526020019081526020016000206000015414156102995760405180604001604052806000815260200160608152506040516020016102709190610437565b60405160208183030381529060405291505061029b565b805b92915050565b60016000815480929190610100906102b79190610371565b50506001546000808381526020019081526020016000206000018190555080600080838152602001908152602001600020600101819055506000600080838152602001908152602001600020600201819055503360008083815260200190815260200160002060030160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055507f5f7666f5326453e0ad5c1c8e8b158fa5323f6d899c9f5b8c826168ca5bf5033e60015483336040516103399392919061066e565b60405180910390a15050565b60008181526020019081526020016000206000015481565b60008181526020019081526020016000205481565b6000819050919050565b60006103708261035c565b9050919050565b60006103808261035c565b91507fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff82036103b2576103b16103c6565b5b600182019050919050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fd5b600060608301600083015161040f600082018761035c565b5060208301516104226020830182610437565b5060408301516104356040830182610437565b50809150509291505056";
+        
+        const contractABI = [
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "id",
+                        "type": "uint256"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "string",
+                        "name": "result",
+                        "type": "string"
+                    }
+                ],
+                "name": "TaskCompleted",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "id",
+                        "type": "uint256"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "string",
+                        "name": "topic",
+                        "type": "string"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "address",
+                        "name": "requester",
+                        "type": "address"
+                    }
+                ],
+                "name": "TaskCreated",
+                "type": "event"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "_id",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "_result",
+                        "type": "string"
+                    }
+                ],
+                "name": "completeTask",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "string",
+                        "name": "_topic",
+                        "type": "string"
+                    }
+                ],
+                "name": "createTask",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "_id",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "getTask",
+                "outputs": [
+                    {
+                        "components": [
+                            {
+                                "internalType": "uint256",
+                                "name": "id",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "topic",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "result",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "address",
+                                "name": "requester",
+                                "type": "address"
+                            }
+                        ],
+                        "internalType": "struct AIAgent.Task",
+                        "name": "",
+                        "type": "tuple"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "taskCounter",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            }
+        ];
+
+        // Arbitrum Sepolia chain ID
+        const arbitrumSepoliaChainId = '0x66eee';  // 421614 in hex
+
+        // Show status message
+        function showStatus(element, message, type) {
+            element.textContent = message;
+            element.className = `status ${type}`;
+        }
+
+        // Check if MetaMask is installed
+        function checkMetaMaskInstalled() {
+            if (typeof window.ethereum !== 'undefined') {
+                return true;
+            } else {
+                showStatus(connectionStatus, 'MetaMask is not installed. Please install MetaMask to continue.', 'error');
+                return false;
+            }
+        }
+
+        // Connect to MetaMask
+        async function connectWallet() {
+            if (!checkMetaMaskInstalled()) return;
+
+            try {
+                showStatus(connectionStatus, 'Connecting to MetaMask...', 'info');
+                
+                // Request account access
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                currentAccount = accounts[0];
+                accountSpan.textContent = `${currentAccount.substring(0, 6)}...${currentAccount.substring(38)}`;
+                
+                // Get network info
+                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+                currentChainId = parseInt(chainId, 16);
+                
+                // Get network name
+                let networkName = 'Unknown';
+                if (currentChainId === 1) networkName = 'Ethereum Mainnet';
+                else if (currentChainId === 421614) networkName = 'Arbitrum Sepolia';
+                else if (currentChainId === 42161) networkName = 'Arbitrum One';
+                else networkName = `Chain ID: ${currentChainId}`;
+                
+                networkSpan.textContent = networkName;
+                
+                // Get balance
+                const balance = await window.ethereum.request({ 
+                    method: 'eth_getBalance',
+                    params: [currentAccount, 'latest']
+                });
+                
+                // Convert balance from wei to ETH
+                const balanceInEth = parseInt(balance, 16) / 1e18;
+                balanceSpan.textContent = `${balanceInEth.toFixed(4)} ETH`;
+                
+                // Enable buttons based on network
+                switchNetworkBtn.disabled = false;
+                
+                if (currentChainId === 421614) {
+                    showStatus(connectionStatus, 'Connected to Arbitrum Sepolia!', 'success');
+                    deployContractBtn.disabled = false;
+                } else {
+                    showStatus(connectionStatus, 'Please switch to Arbitrum Sepolia network', 'warning');
+                    deployContractBtn.disabled = true;
+                }
+                
+                // Setup event listeners for account and chain changes
+                window.ethereum.on('accountsChanged', handleAccountsChanged);
+                window.ethereum.on('chainChanged', handleChainChanged);
+                
+            } catch (error) {
+                console.error(error);
+                showStatus(connectionStatus, `Error connecting to MetaMask: ${error.message}`, 'error');
+            }
+        }
+
+        // Switch to Arbitrum Sepolia network
+        async function switchNetwork() {
+            try {
+                showStatus(connectionStatus, 'Switching to Arbitrum Sepolia...', 'info');
+                
+                try {
+                    // Try to switch to Arbitrum Sepolia
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: arbitrumSepoliaChainId }],
+                    });
+                } catch (switchError) {
+                    // If the network is not added, add it
+                    if (switchError.code === 4902) {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [{
+                                chainId: arbitrumSepoliaChainId,
+                                chainName: 'Arbitrum Sepolia',
+                                nativeCurrency: {
+                                    name: 'ETH',
+                                    symbol: 'ETH',
+                                    decimals: 18
+                                },
+                                rpcUrls: ['https://sepolia-rollup.arbitrum.io/rpc'],
+                                blockExplorerUrls: ['https://sepolia.arbiscan.io/']
+                            }],
+                        });
+                    } else {
+                        throw switchError;
+                    }
+                }
+                
+                // Get updated chain ID
+                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+                currentChainId = parseInt(chainId, 16);
+                
+                // Get network name
+                let networkName = 'Unknown';
+                if (currentChainId === 1) networkName = 'Ethereum Mainnet';
+                else if (currentChainId === 421614) networkName = 'Arbitrum Sepolia';
+                else if (currentChainId === 42161) networkName = 'Arbitrum One';
+                else networkName = `Chain ID: ${currentChainId}`;
+                
+                networkSpan.textContent = networkName;
+                
+                // Get updated balance
+                const balance = await window.ethereum.request({ 
+                    method: 'eth_getBalance',
+                    params: [currentAccount, 'latest']
+                });
+                
+                // Convert balance from wei to ETH
+                const balanceInEth = parseInt(balance, 16) / 1e18;
+                balanceSpan.textContent = `${balanceInEth.toFixed(4)} ETH`;
+                
+                if (currentChainId === 421614) {
+                    showStatus(connectionStatus, 'Connected to Arbitrum Sepolia!', 'success');
+                    deployContractBtn.disabled = false;
+                } else {
+                    showStatus(connectionStatus, 'Failed to switch to Arbitrum Sepolia', 'error');
+                    deployContractBtn.disabled = true;
+                }
+                
+            } catch (error) {
+                console.error(error);
+                showStatus(connectionStatus, `Error switching network: ${error.message}`, 'error');
+            }
+        }
+
+        // Deploy the contract
+        async function deployContract() {
+            if (!currentAccount) {
+                showStatus(deploymentStatus, 'Please connect to MetaMask first', 'warning');
+                return;
+            }
+            
+            if (currentChainId !== 421614) {
+                showStatus(deploymentStatus, 'Please switch to Arbitrum Sepolia network', 'warning');
+                return;
+            }
+            
+            try {
+                showStatus(deploymentStatus, 'Deploying AIAgent contract...', 'info');
+                deployContractBtn.disabled = true;
+                
+                // Create transaction object
+                const transactionParameters = {
+                    from: currentAccount,
+                    data: contractBytecode,
+                    gas: '0x500000', // Gas limit
+                };
+                
+                // Send transaction
+                const txHash = await window.ethereum.request({
+                    method: 'eth_sendTransaction',
+                    params: [transactionParameters],
+                });
+                
+                showStatus(deploymentStatus, 'Transaction sent! Waiting for confirmation...', 'info');
+                txHashSpan.textContent = txHash;
+                
+                // Poll for transaction receipt
+                let receipt = null;
+                const maxAttempts = 30;
+                let attempts = 0;
+                
+                const getReceipt = async () => {
+                    attempts++;
+                    receipt = await window.ethereum.request({
+                        method: 'eth_getTransactionReceipt',
+                        params: [txHash],
+                    });
+                    
+                    if (receipt === null) {
+                        if (attempts < maxAttempts) {
+                            // Wait 2 seconds before trying again
+                            setTimeout(getReceipt, 2000);
+                        } else {
+                            showStatus(deploymentStatus, 'Deployment is taking longer than expected. Check Arbiscan for status.', 'warning');
+                            explorerLink.href = `https://sepolia.arbiscan.io/tx/${txHash}`;
+                            explorerLink.textContent = 'Check transaction status on Arbiscan';
+                            deploymentInfo.style.display = 'block';
+                        }
+                    } else {
+                        if (receipt.status === '0x1') {
+                            // Transaction successful
+                            const contractAddress = receipt.contractAddress;
+                            contractAddressSpan.textContent = contractAddress;
+                            contractAddressEnvSpan.textContent = contractAddress;
+                            explorerLink.href = `https://sepolia.arbiscan.io/address/${contractAddress}`;
+                            
+                            deploymentInfo.style.display = 'block';
+                            showStatus(deploymentStatus, 'Contract deployed successfully!', 'success');
+                            
+                            // Log deployment info to console
+                            console.log('Deployment Info:');
+                            console.log('----------------');
+                            console.log(`Contract Address: ${contractAddress}`);
+                            console.log(`Transaction Hash: ${txHash}`);
+                            console.log(`Explorer Link: https://sepolia.arbiscan.io/address/${contractAddress}`);
+                            console.log('\nUpdate your .env file:');
+                            console.log(`CONTRACT_ADDRESS="${contractAddress}"`);
+                        } else {
+                            // Transaction failed
+                            showStatus(deploymentStatus, 'Deployment failed. Check transaction on Arbiscan.', 'error');
+                            explorerLink.href = `https://sepolia.arbiscan.io/tx/${txHash}`;
+                            deploymentInfo.style.display = 'block';
+                        }
+                    }
+                };
+                
+                getReceipt();
+                
+            } catch (error) {
+                console.error(error);
+                deployContractBtn.disabled = false;
+                showStatus(deploymentStatus, `Deployment failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Handle account changes
+        function handleAccountsChanged(accounts) {
+            if (accounts.length === 0) {
+                // MetaMask is locked or user has no accounts
+                showStatus(connectionStatus, 'Please connect to MetaMask', 'warning');
+                resetConnection();
+            } else if (accounts[0] !== currentAccount) {
+                currentAccount = accounts[0];
+                accountSpan.textContent = `${currentAccount.substring(0, 6)}...${currentAccount.substring(38)}`;
+                
+                // Update balance for new account
+                updateBalance();
+            }
+        }
+
+        // Handle chain changes
+        function handleChainChanged() {
+            // Reload the page on chain change
+            window.location.reload();
+        }
+
+        // Update balance
+        async function updateBalance() {
+            if (currentAccount) {
+                const balance = await window.ethereum.request({ 
+                    method: 'eth_getBalance',
+                    params: [currentAccount, 'latest']
+                });
+                
+                // Convert balance from wei to ETH
+                const balanceInEth = parseInt(balance, 16) / 1e18;
+                balanceSpan.textContent = `${balanceInEth.toFixed(4)} ETH`;
+            }
+        }
+
+        // Reset connection state
+        function resetConnection() {
+            currentAccount = null;
+            accountSpan.textContent = 'Not connected';
+            networkSpan.textContent = 'Not connected';
+            balanceSpan.textContent = '-';
+            switchNetworkBtn.disabled = true;
+            deployContractBtn.disabled = true;
+        }
+
+        // Event listeners
+        connectWalletBtn.addEventListener('click', connectWallet);
+        switchNetworkBtn.addEventListener('click', switchNetwork);
+        deployContractBtn.addEventListener('click', deployContract);
+    </script>
+</body>
+</html>

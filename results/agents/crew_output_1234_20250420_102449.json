@@ -1,0 +1,48 @@
+{
+  "task_id": 1234,
+  "timestamp": "2025-04-20 10:24:49",
+  "property_address": "LNCT Bhopal",
+  "task_type": "investment_analysis",
+  "transaction_hash": null,
+  "crew_output": {
+    "raw": "```json\n{\n  \"roi\": \"Est. 5-8% based on similar properties. Rent: $3/sqft, Expenses: 30%, ROI = (Net Income/Price)*100\",\n  \"cap_rate\": \"Est. 6-7%. NOI = (567000 sqft * $3/sqft * 0.7) = $1190700. Cap Rate = NOI/Price = $1190700/$240000 = ~5\",\n  \"cash_flow\": \"Positive if occupied. Vacancy risk exists. Pro Forma: $1.2M revenue, $360k expenses, $840k CF\",\n  \"appreciation\": \"Moderate. Bhopal market growth dependent. Expect 2-3% annually. Location is key.\",\n  \"risk_assessment\": \"Market volatility, vacancy, maintenance. Occupancy rate impacts cash flow. Probability: Medium (40%)\",\n  \"recommendations\": \"Secure long-term tenants. Improve property management. Explore value-add opportunities.\",\n  \"summary\": \"Potential high-yield commercial property. Requires due diligence on market and tenants. Moderate risk.\"\n}\n```",
+    "pydantic": null,
+    "json_dict": {
+      "roi": "Est. 5-8% based on similar properties. Rent: $3/sqft, Expenses: 30%, ROI = (Net Income/Price)*100",
+      "cap_rate": "Est. 6-7%. NOI = (567000 sqft * $3/sqft * 0.7) = $1190700. Cap Rate = NOI/Price = $1190700/$240000 = ~5",
+      "cash_flow": "Positive if occupied. Vacancy risk exists. Pro Forma: $1.2M revenue, $360k expenses, $840k CF",
+      "appreciation": "Moderate. Bhopal market growth dependent. Expect 2-3% annually. Location is key.",
+      "risk_assessment": "Market volatility, vacancy, maintenance. Occupancy rate impacts cash flow. Probability: Medium (40%)",
+      "recommendations": "Secure long-term tenants. Improve property management. Explore value-add opportunities.",
+      "summary": "Potential high-yield commercial property. Requires due diligence on market and tenants. Moderate risk."
+    },
+    "tasks_output": [
+      {
+        "description": "Analyze the investment potential of the property at LNCT Bhopal. \n                        Task type: investment_analysis.\n                        Additional details: {\n  \"property_details\": {\n    \"property_type\": \"Commercial\",\n    \"bedrooms\": 250,\n    \"bathrooms\": 100.0,\n    \"square_footage\": 567000,\n    \"year_built\": 1994,\n    \"price\": 240000.0\n  }\n}\n                        \n                        Provide a comprehensive analysis including:\n                        1. Estimated ROI and cap rate\n                        2. Cash flow projections\n                        3. Appreciation potential\n                        4. Risk assessment\n                        5. Specific recommendations\n                        \n                        You MUST format your response as a JSON object with the following EXACT keys:\n                        - roi: Return on investment metrics and calculations\n                        - cap_rate: Capitalization rate and related metrics\n                        - cash_flow: Cash flow projections and analysis\n                        - appreciation: Expected property appreciation over time\n                        - risk_assessment: Analysis of investment risks\n                        - recommendations: Specific investment recommendations\n                        - summary: Brief overview of overall assessment\n                        \n                        Keep your total response under 2000 characters for blockchain storage efficiency.\n                        ",
+        "name": null,
+        "expected_output": "A JSON object containing the real estate analysis results",
+        "summary": "Analyze the investment potential of the property at LNCT Bhopal....",
+        "raw": "```json\n{\n  \"roi\": \"Est. 5-8% based on similar properties. Rent: $3/sqft, Expenses: 30%, ROI = (Net Income/Price)*100\",\n  \"cap_rate\": \"Est. 6-7%. NOI = (567000 sqft * $3/sqft * 0.7) = $1190700. Cap Rate = NOI/Price = $1190700/$240000 = ~5\",\n  \"cash_flow\": \"Positive if occupied. Vacancy risk exists. Pro Forma: $1.2M revenue, $360k expenses, $840k CF\",\n  \"appreciation\": \"Moderate. Bhopal market growth dependent. Expect 2-3% annually. Location is key.\",\n  \"risk_assessment\": \"Market volatility, vacancy, maintenance. Occupancy rate impacts cash flow. Probability: Medium (40%)\",\n  \"recommendations\": \"Secure long-term tenants. Improve property management. Explore value-add opportunities.\",\n  \"summary\": \"Potential high-yield commercial property. Requires due diligence on market and tenants. Moderate risk.\"\n}\n```",
+        "pydantic": null,
+        "json_dict": {
+          "roi": "Est. 5-8% based on similar properties. Rent: $3/sqft, Expenses: 30%, ROI = (Net Income/Price)*100",
+          "cap_rate": "Est. 6-7%. NOI = (567000 sqft * $3/sqft * 0.7) = $1190700. Cap Rate = NOI/Price = $1190700/$240000 = ~5",
+          "cash_flow": "Positive if occupied. Vacancy risk exists. Pro Forma: $1.2M revenue, $360k expenses, $840k CF",
+          "appreciation": "Moderate. Bhopal market growth dependent. Expect 2-3% annually. Location is key.",
+          "risk_assessment": "Market volatility, vacancy, maintenance. Occupancy rate impacts cash flow. Probability: Medium (40%)",
+          "recommendations": "Secure long-term tenants. Improve property management. Explore value-add opportunities.",
+          "summary": "Potential high-yield commercial property. Requires due diligence on market and tenants. Moderate risk."
+        },
+        "agent": "Real Estate Investment Analyst",
+        "output_format": "json"
+      }
+    ],
+    "token_usage": {
+      "total_tokens": 6114,
+      "prompt_tokens": 5340,
+      "cached_prompt_tokens": 0,
+      "completion_tokens": 774,
+      "successful_requests": 3
+    }
+  }
+}

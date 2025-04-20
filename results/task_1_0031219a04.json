@@ -1,0 +1,15 @@
+{
+  "task_id": 1,
+  "transaction_hash": "0xc24b8a74bfdfe4bee9f334e5f32ee02a4f3c075da1373d10f78c2544d95f3b98",
+  "timestamp": "2025-04-20 02:25:06",
+  "structured_output": {
+    "roi": "Low-Moderate. Est. 3-5% based on market trends & rental potential after expenses.",
+    "cap_rate": "Est. 1-2%. NYC condos have high costs, impacting cap rate.",
+    "cash_flow": "Potentially negative initially due to high expenses & mortgage. Depends heavily on rental income.",
+    "appreciation": "Moderate. NYC real estate appreciates long-term, but short-term gains are uncertain. Est. 2-4%/year.",
+    "risk_assessment": "High. High property taxes, market volatility, potential for vacancies. Probability: 60%",
+    "recommendations": "Thoroughly analyze expenses. Consider renting out. Monitor market trends closely. Negotiate price.",
+    "summary": "High-priced condo in volatile market. Requires careful financial planning. Long-term appreciation potential exists."
+  },
+  "raw_result": "{\"roi\":\"Low-Moderate. Est. 3-5% based on market trends & rental potential after expenses.\",\"cap_rate\":\"Est. 1-2%. NYC condos have high costs, impacting cap rate.\",\"cash_flow\":\"Potentially negative initially due to high expenses & mortgage. Depends heavily on rental income.\",\"appreciation\":\"Moderate. NYC real estate appreciates long-term, but short-term gains are uncertain. Est. 2-4%/year.\",\"risk_assessment\":\"High. High property taxes, market volatility, potential for vacancies. Probability: 60%\",\"recommendations\":\"Thoroughly analyze expenses. Consider renting out. Monitor market trends closely. Negotiate price.\",\"summary\":\"High-priced condo in volatile market. Requires careful financial planning. Long-term appreciation potential exists.\"}"
+}

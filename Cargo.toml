@@ -1,0 +1,29 @@
+[package]
+name = "ai-agent"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+stylus-sdk = "0.4.1"
+alloy-primitives = "0.3.1"
+alloy-sol-types = "0.3.1"
+hex = "0.4.3"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Needed for WASM output
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+export-abi = ["stylus-sdk/export-abi"]
+
+[profile.release]
+codegen-units = 1
+strip = true
+lto = true
+panic = "abort"
+opt-level = "z"
+
+# Needed for smaller WASM output
+[workspace]

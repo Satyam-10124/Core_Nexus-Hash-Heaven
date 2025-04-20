@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+
+{% block title %}Blockchain Information - OnChain Real Estate AI{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">
+                    <i class="bi bi-link-45deg me-2"></i>Blockchain Information
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header bg-dark text-white">
+                                <h5 class="card-title mb-0">Network Details</h5>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Network:</strong> Arbitrum Sepolia Testnet</p>
+                                <p><strong>Chain ID:</strong> 421614</p>
+                                <p><strong>RPC URL:</strong> https://sepolia-rollup.arbitrum.io/rpc</p>
+                                <p><strong>Explorer:</strong> <a href="https://sepolia.arbiscan.io/" target="_blank">https://sepolia.arbiscan.io/</a></p>
+                                <p><strong>Contract Address:</strong> <a href="https://sepolia.arbiscan.io/address/0x6218f4b695c4b54f7eb02060d80a7ee3649024e9" target="_blank">0x6218f4b695c4b54f7eb02060d80a7ee3649024e9 <i class="bi bi-box-arrow-up-right ms-1"></i></a></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header bg-dark text-white">
+                                <h5 class="card-title mb-0">Contract Information</h5>
+                            </div>
+                            <div class="card-body">
+                                {% if blockchain_data and blockchain_data.contract_owner %}
+                                    <p>
+                                        <strong>Contract Owner:</strong> 
+                                        <a href="https://sepolia.arbiscan.io/address/{{ blockchain_data.contract_owner }}" target="_blank" class="text-break">
+                                            {{ blockchain_data.contract_owner }}
+                                            <i class="bi bi-box-arrow-up-right ms-1"></i>
+                                        </a>
+                                    </p>
+                                    <p>
+                                        <strong>Connected Account:</strong> 
+                                        <span class="text-break">{{ blockchain_data.account_address }}</span>
+                                    </p>
+                                    <p>
+                                        <strong>Owner Status:</strong> 
+                                        {% if blockchain_data.is_owner %}
+                                            <span class="badge bg-success">Owner</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Not Owner</span>
+                                        {% endif %}
+                                    </p>
+                                {% else %}
+                                    <p class="text-muted">Contract information not available</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="card-title mb-0">Smart Contract Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6>AIAgent Contract</h6>
+                        <p>This smart contract stores real estate analysis tasks and their results on the Arbitrum blockchain.</p>
+                        
+                        <div class="accordion" id="contractAccordion">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStructure">
+                                        Contract Structure
+                                    </button>
+                                </h2>
+                                <div id="collapseStructure" class="accordion-collapse collapse" data-bs-parent="#contractAccordion">
+                                    <div class="accordion-body">
+                                        <pre class="bg-light p-3 rounded"><code>struct Task {
+    uint256 id;
+    string topic;      // Contains property address and task details (JSON)
+    string result;     // Contains AI analysis results
+    address requester; // Address that created the task
+    bool completed;    // Flag to track if task has been completed
+}</code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFunctions">
+                                        Contract Functions
+                                    </button>
+                                </h2>
+                                <div id="collapseFunctions" class="accordion-collapse collapse" data-bs-parent="#contractAccordion">
+                                    <div class="accordion-body">
+                                        <ul class="list-group">
+                                            <li class="list-group-item">
+                                                <strong>createTask(string memory _topic) public returns (uint256)</strong>
+                                                <p class="mb-0">Creates a new task with the given topic and returns the task ID.</p>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <strong>completeTask(uint256 _id, string memory _result) public onlyOwner</strong>
+                                                <p class="mb-0">Completes a task by storing the result. Only callable by the contract owner.</p>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <strong>getTask(uint256 _id) public view returns (Task memory)</strong>
+                                                <p class="mb-0">Retrieves a task by ID.</p>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <strong>taskExistsCheck(uint256 _id) public view returns (bool)</strong>
+                                                <p class="mb-0">Checks if a task exists.</p>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEvents">
+                                        Contract Events
+                                    </button>
+                                </h2>
+                                <div id="collapseEvents" class="accordion-collapse collapse" data-bs-parent="#contractAccordion">
+                                    <div class="accordion-body">
+                                        <ul class="list-group">
+                                            <li class="list-group-item">
+                                                <strong>TaskCreated(uint256 indexed id, string topic, address indexed requester)</strong>
+                                                <p class="mb-0">Emitted when a new task is created.</p>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <strong>TaskCompleted(uint256 indexed id, string result)</strong>
+                                                <p class="mb-0">Emitted when a task is completed.</p>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <strong>OwnershipTransferred(address indexed previousOwner, address indexed newOwner)</strong>
+                                                <p class="mb-0">Emitted when ownership of the contract is transferred.</p>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="card-title mb-0">Recent Blockchain Activity</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if blockchain_data and blockchain_data.tasks %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Event</th>
+                                            <th>Task ID</th>
+                                            <th>Block</th>
+                                            <th>Transaction</th>
+                                            <th>Requester</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for task in blockchain_data.tasks %}
+                                            {% if task.created_tx %}
+                                                <tr>
+                                                    <td><span class="badge bg-primary">TaskCreated</span></td>
+                                                    <td>{{ task.id }}</td>
+                                                    <td>
+                                                        <a href="https://sepolia.arbiscan.io/block/{{ task.created_block }}" target="_blank">
+                                                            {{ task.created_block }}
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        <a href="https://sepolia.arbiscan.io/tx/{{ task.created_tx }}" target="_blank" class="text-truncate d-inline-block" style="max-width: 150px;">
+                                                            {{ task.created_tx }}
+                                                            <i class="bi bi-box-arrow-up-right"></i>
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        <a href="https://sepolia.arbiscan.io/address/{{ task.requester }}" target="_blank" class="text-truncate d-inline-block" style="max-width: 100px;">
+                                                            {{ task.requester|truncate(10) }}
+                                                            <i class="bi bi-box-arrow-up-right"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            {% endif %}
+                                            
+                                            {% if task.completed_tx %}
+                                                <tr>
+                                                    <td><span class="badge bg-success">TaskCompleted</span></td>
+                                                    <td>{{ task.id }}</td>
+                                                    <td>
+                                                        <a href="https://sepolia.arbiscan.io/block/{{ task.completed_block }}" target="_blank">
+                                                            {{ task.completed_block }}
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        <a href="https://sepolia.arbiscan.io/tx/{{ task.completed_tx }}" target="_blank" class="text-truncate d-inline-block" style="max-width: 150px;">
+                                                            {{ task.completed_tx }}
+                                                            <i class="bi bi-box-arrow-up-right"></i>
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        <a href="https://sepolia.arbiscan.io/address/{{ blockchain_data.contract_owner }}" target="_blank" class="text-truncate d-inline-block" style="max-width: 100px;">
+                                                            {{ blockchain_data.contract_owner|truncate(10) }}
+                                                            <i class="bi bi-box-arrow-up-right"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle me-2"></i>
+                                No blockchain activity found.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

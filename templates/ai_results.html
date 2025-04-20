@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}AI Agent Results - OnChain Real Estate AI{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h2 mb-0">
+                <i class="bi bi-robot text-primary me-2"></i>AI Agent Results
+            </h1>
+            <a href="{{ url_for('index') }}" class="btn btn-outline-primary">
+                <i class="bi bi-house-door me-2"></i>Back to Home
+            </a>
+        </div>
+        
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-list-ul me-2"></i>Stored AI Results
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if results %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Task ID</th>
+                                    <th>Transaction Hash</th>
+                                    <th>Timestamp</th>
+                                    <th>Type</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for result in results %}
+                                <tr>
+                                    <td>{{ result.task_id }}</td>
+                                    <td>
+                                        {% if result.transaction_hash %}
+                                            <span class="badge bg-secondary">{{ result.transaction_hash[:10] }}...{{ result.transaction_hash[-6:] }}</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">No Hash</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ result.timestamp if result.timestamp else 'N/A' }}</td>
+                                    <td>
+                                        {% if 'structured_output' in result %}
+                                            <span class="badge bg-info">Full Analysis</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Simple Result</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if result.filename %}
+                                            {% set file_hash = result.filename.split('_')[-1].split('.')[0] %}
+                                            <a href="{{ url_for('ai_result_detail', task_id=result.task_id, file_hash=file_hash) }}" class="btn btn-sm btn-primary">
+                                                <i class="bi bi-eye me-1"></i>View
+                                            </a>
+                                        {% else %}
+                                            <button class="btn btn-sm btn-secondary" disabled>
+                                                <i class="bi bi-eye-slash me-1"></i>Not Available
+                                            </button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>No AI results found in the results directory.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-info-circle me-2"></i>About AI Results
+                </h5>
+            </div>
+            <div class="card-body">
+                <p>
+                    The AI agent analyzes real estate properties and stores the results as JSON files in the <code>results</code> directory.
+                    Each result contains structured data about the property analysis, including ROI estimates, risk assessments, and recommendations.
+                </p>
+                <p>
+                    Results are linked to blockchain transactions, making the analysis tamper-proof and permanently accessible.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

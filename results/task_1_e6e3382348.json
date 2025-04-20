@@ -1,0 +1,47 @@
+{
+  "task_id": 1,
+  "transaction_hash": "e6e3382348afae98277c9125100c6edffe6eacaf01b283618393b745d1f84b2b",
+  "timestamp": "2025-04-20 09:49:06",
+  "structured_output": {
+    "raw": "{\n  \"roi\": \"Assuming $150k purchase, 10% down, $15k rehab, ROI ~8-12% potential\",\n  \"cap_rate\": \"Based on $150k value and est. $1500/mo rent, cap rate ~6-8% potential\",\n  \"cash_flow\": \"Est. $300-$500/mo positive cash flow after expenses & mortgage\",\n  \"appreciation\": \"Springfield homes appreciating ~4.5%/yr. Expect similar gains.\",\n  \"risk_assessment\": \"Market risk: moderate. Property risk: depends on inspection.\",\n  \"recommendations\": \"Good potential. Verify financials, inspect thoroughly.\",\n  \"summary\": \"Solid investment potential, but requires due diligence.\"\n}",
+    "pydantic": null,
+    "json_dict": {
+      "roi": "Assuming $150k purchase, 10% down, $15k rehab, ROI ~8-12% potential",
+      "cap_rate": "Based on $150k value and est. $1500/mo rent, cap rate ~6-8% potential",
+      "cash_flow": "Est. $300-$500/mo positive cash flow after expenses & mortgage",
+      "appreciation": "Springfield homes appreciating ~4.5%/yr. Expect similar gains.",
+      "risk_assessment": "Market risk: moderate. Property risk: depends on inspection.",
+      "recommendations": "Good potential. Verify financials, inspect thoroughly.",
+      "summary": "Solid investment potential, but requires due diligence."
+    },
+    "tasks_output": [
+      {
+        "description": "Analyze the investment potential of the property at 123 Main St, Springfield, IL. \n                        Task type: investment_analysis.\n                        Additional details: {\n  \"extra_info\": \"Research on real estate trends\"\n}\n                        \n                        Provide a comprehensive analysis including:\n                        1. Estimated ROI and cap rate\n                        2. Cash flow projections\n                        3. Appreciation potential\n                        4. Risk assessment\n                        5. Specific recommendations\n                        \n                        You MUST format your response as a JSON object with the following EXACT keys:\n                        - roi: Return on investment metrics and calculations\n                        - cap_rate: Capitalization rate and related metrics\n                        - cash_flow: Cash flow projections and analysis\n                        - appreciation: Expected property appreciation over time\n                        - risk_assessment: Analysis of investment risks\n                        - recommendations: Specific investment recommendations\n                        - summary: Brief overview of overall assessment\n                        \n                        Keep your total response under 2000 characters for blockchain storage efficiency.\n                        ",
+        "name": null,
+        "expected_output": "A JSON object containing the real estate analysis results",
+        "summary": "Analyze the investment potential of the property at 123 Main...",
+        "raw": "{\n  \"roi\": \"Assuming $150k purchase, 10% down, $15k rehab, ROI ~8-12% potential\",\n  \"cap_rate\": \"Based on $150k value and est. $1500/mo rent, cap rate ~6-8% potential\",\n  \"cash_flow\": \"Est. $300-$500/mo positive cash flow after expenses & mortgage\",\n  \"appreciation\": \"Springfield homes appreciating ~4.5%/yr. Expect similar gains.\",\n  \"risk_assessment\": \"Market risk: moderate. Property risk: depends on inspection.\",\n  \"recommendations\": \"Good potential. Verify financials, inspect thoroughly.\",\n  \"summary\": \"Solid investment potential, but requires due diligence.\"\n}",
+        "pydantic": null,
+        "json_dict": {
+          "roi": "Assuming $150k purchase, 10% down, $15k rehab, ROI ~8-12% potential",
+          "cap_rate": "Based on $150k value and est. $1500/mo rent, cap rate ~6-8% potential",
+          "cash_flow": "Est. $300-$500/mo positive cash flow after expenses & mortgage",
+          "appreciation": "Springfield homes appreciating ~4.5%/yr. Expect similar gains.",
+          "risk_assessment": "Market risk: moderate. Property risk: depends on inspection.",
+          "recommendations": "Good potential. Verify financials, inspect thoroughly.",
+          "summary": "Solid investment potential, but requires due diligence."
+        },
+        "agent": "Real Estate Investment Analyst",
+        "output_format": "json"
+      }
+    ],
+    "token_usage": {
+      "total_tokens": 3640,
+      "prompt_tokens": 3179,
+      "cached_prompt_tokens": 0,
+      "completion_tokens": 461,
+      "successful_requests": 2
+    }
+  },
+  "raw_result": "{\n  \"raw\": \"{\\n  \\\"roi\\\": \\\"Assuming $150k purchase, 10% down, $15k rehab, ROI ~8-12% potential\\\",\\n  \\\"cap_rate\\\": \\\"Based on $150k value and est. $1500/mo rent, cap rate ~6-8% potential\\\",\\n  \\\"cash_flow\\\": \\\"Est. $300-$500/mo positive cash flow after expenses & mortgage\\\",\\n  \\\"appreciation\\\": \\\"Springfield homes appreciating ~4.5%/yr. Expect similar gains.\\\",\\n  \\\"risk_assessment\\\": \\\"Market risk: moderate. Property risk: depends on inspection.\\\",\\n  \\\"recommendations\\\": \\\"Good potential. Verify financials, inspect thoroughly.\\\",\\n  \\\"summary\\\": \\\"Solid investment potential, but requires due diligence.\\\"\\n}\",\n  \"pydantic\": null,\n  \"json_dict\": {\n    \"roi\": \"Assuming $150k purchase, 10% down, $15k rehab, ROI ~8-12% potential\",\n    \"cap_rate\": \"Based on $150k value and est. $1500/mo rent, cap rate ~6-8% potential\",\n    \"cash_flow\": \"Est. $300-$500/mo positive cash flow after expenses & mortgage\",\n    \"appreciation\": \"Springfield homes appreciating ~4.5%/yr. Expect similar gains.\",\n    \"risk_assessment\": \"Market risk: moderate. Property risk: depends on inspection.\",\n    \"recommendations\": \"Good potential. Verify financials, inspect thoroughly.\",\n    \"summary\": \"Solid investment potential, but requires due diligence.\"\n  },\n  \"tasks_output\": [\n    {\n      \"description\": \"Analyze the investment potential of the property at 123 Main St, Springfield, IL. \\n                        Task type: investment_analysis.\\n                        Additional details: {\\n  \\\"extra_info\\\": \\\"Research on real estate trends\\\"\\n}\\n                        \\n                        Provide a comprehensive analysis including:\\n                        1. Estimated ROI and cap rate\\n                        2. Cash flow projections\\n                        3. Appreciation potential\\n                        4. Risk assessment\\n                        5. Specific recommendations\\n                        \\n                        You MUST format your response as a JSON object with the following EXACT keys:\\n                        - roi: Return on investment metrics and calculations\\n                        - cap_rate: Capitalization rate and related metrics\\n                        - cash_flow: Cash flow projections and analysis\\n                        - appreciation: Expected property appreciation over time\\n                        - risk_assessment: Analysis of investment risks\\n                        - recommendations: Specific investment recommendations\\n                        - summary: Brief overview of overall assessment\\n                        \\n                        Keep your total response under 2000 characters for blockchain storage efficiency.\\n                        \",\n      \"name\": null,\n      \"expected_output\": \"A JSON object containing the real estate analysis results\",\n      \"summary\": \"Analyze the investment potential of the property at 123 Main...\",\n      \"raw\": \"{\\n  \\\"roi\\\": \\\"Assuming $150k purchase, 10% down, $15k rehab, ROI ~8-12% potential\\\",\\n  \\\"cap_rate\\\": \\\"Based on $150k value and est. $1500/mo rent, cap rate ~6-8% potential\\\",\\n  \\\"cash_flow\\\": \\\"Est. $300-$500/mo positive cash flow after expenses & mortgage\\\",\\n  \\\"appreciation\\\": \\\"Springfield homes appreciating ~4.5%/yr. Expect similar gains.\\\",\\n  \\\"risk_assessment\\\": \\\"Market risk: moderate. Property risk: depends on inspection.\\\",\\n  \\\"recommendations\\\": \\\"Good potential. Verify financials, inspect thoroughly.\\\",\\n  \\\"summary\\\": \\\"Solid investment potential, but requires due diligence.\\\"\\n}\",\n      \"pydantic\": null,\n      \"json_dict\": {\n        \"roi\": \"Assuming $150k purchase, 10% down, $15k rehab, ROI ~8-12% potential\",\n        \"cap_rate\": \"Based on $150k value and est. $1500/mo rent, cap rate ~6-8% potential\",\n        \"cash_flow\": \"Est. $300-$500/mo positive cash flow after expenses & mortgage\",\n        \"appreciation\": \"Springfield homes appreciating ~4.5%/yr. Expect similar gains.\",\n        \"risk_assessment\": \"Market risk: moderate. Property risk: depends on inspection.\",\n        \"recommendations\": \"Good potential. Verify financials, inspect thoroughly.\",\n        \"summary\": \"Solid investment potential, but requires due diligence.\"\n      },\n      \"agent\": \"Real Estate Investment Analyst\",\n      \"output_format\": \"json\"\n    }\n  ],\n  \"token_usage\": {\n    \"total_tokens\": 3640,\n    \"prompt_tokens\": 3179,\n    \"cached_prompt_tokens\": 0,\n    \"completion_tokens\": 461,\n    \"successful_requests\": 2\n  }\n}"
+}
